@@ -1,0 +1,196 @@
+@charset "UTF-8";
+body {
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    box-sizing: border-box;
+}
+
+main {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+header {
+    background-color: #87CEFA;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    color: white;
+    box-shadow: 0px 0px 3px 0px black;
+    width: 100%;
+}
+
+.logo img {
+    max-width: 150px;
+    margin-right: 30px;
+}
+
+nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: row;
+}
+
+nav ul li {
+    display: inline;
+    margin-right: 20px;
+}
+
+nav ul li:last-child {
+    margin-right: 0;
+}
+
+input[type="text"] {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 16px;
+}
+
+input[type="submit"] {
+    padding: 8px;
+    background-color: #87CEFA;
+    border: none;
+    border-radius: 4px;
+    margin-left: 20px;
+}
+
+input[type="submit"]:hover {
+    background-color: #5F9EA0;
+}
+
+select {
+    font-size: 15px;
+    padding: 10px 15px;
+    display: inline-block;
+    background-color: whitesmoke;
+    color: black;
+    text-decoration: none;
+    border-radius: 10px;
+    margin-bottom: 5px;
+    border: none;
+    width: 400px;
+}
+
+.formChamada{
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+
+.cabecalhoChamada{
+	margin-top: 30px;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+	width: 80%;
+	height: 50px;
+}
+
+.pesquisaProfessor, .disciplinas {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+
+.conteudoChamada{
+	margin-top:50px;
+	width: 40%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+
+table{
+	width: 80%;
+}
+
+th,
+td {
+    padding: 10px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+
+tr:hover {
+    background-color: #f5f5f5;
+}
+
+th {
+    background-color: lightgray;
+    color: black;
+    text-align: center;
+}
+
+th,
+td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.formCadastrarChamada {
+	width:80%;
+	margin-top: 50px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+
+
+.dataContainer{
+	margin-top: 10px;
+	margin-right: auto;
+	margin-left: 10%;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+}
+
+.dataContainer  label {
+	margin-right: 10px;
+}
+
+.btnCadastrarChamada{
+	margin-top: 20px;
+}
+
+input[type="submit"].btnCadastrarChamada {
+    padding: 12px 20px; 
+    background-color: #87CEFA; 
+    color: white; 
+    border: none; 
+    border-radius: 4px; 
+    cursor: pointer; 
+    font-size: 16px; 
+    font-weight: bold;
+    transition: background-color 0.3s; 
+}
+
+input[type="submit"].btnCadastrarChamada:hover {
+    background-color: #5F9EA0;
+}
+
+input[type="date"]{
+    width: 45%; 
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
