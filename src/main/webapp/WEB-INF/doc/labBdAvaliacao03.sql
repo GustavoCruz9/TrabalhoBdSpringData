@@ -136,7 +136,7 @@ primary key(cpf, codDisciplina)
 )
 
 go
---PROCEDURE QUE VALIDA SE O CPF EXISTE OU � INVALIDO
+--PROCEDURE QUE VALIDA SE O CPF EXISTE OU É INVALIDO
 --drop procedure sp_consultaCpf
 create procedure sp_consultaCpf(@cpf char(11), @valido bit output)
 as
@@ -238,7 +238,7 @@ as
 	else
 	begin
 		set @validaIdade = 0
-		raiserror('A idade � menor que 16 anos', 16, 1)
+		raiserror('A idade é menor que 16 anos', 16, 1)
 	end
 
 go
@@ -300,7 +300,7 @@ begin
 end
 
 go
---PROCEDURE QUE VALIDA SE CPF � UNICO NO BANCO DE DADOS DO SISTEMA
+--PROCEDURE QUE VALIDA SE CPF é UNICO NO BANCO DE DADOS DO SISTEMA
 -- drop procedure sp_validaCpfDuplicado
 create procedure sp_validaCpfDuplicado(@cpf char(11), @validaCpfDuplicado bit output)
 as
@@ -320,7 +320,7 @@ as
 	end
 
 go
--- PROCEDURE PARA VERIFICA��O DE RA
+-- PROCEDURE PARA VERIFICAÇÃO DE RA
 -- drop procedure sp_validaRa
 create procedure sp_validaRa(@ra char(9), @saida bit output)
 as
@@ -340,7 +340,7 @@ as
 	end
 
 go
--- PROCEDURE QUE VALIDA SE CURSO � EXISTENTE
+-- PROCEDURE QUE VALIDA SE CURSO É EXISTENTE
 -- drop procedure sp_validaCurso
 create procedure sp_validaCurso(@codCurso int, @validaCurso bit output)
 as
@@ -353,7 +353,7 @@ as
 	else 
 	begin
 		set @validaCurso = 0
-		raiserror('O codigo do curso � invalido', 16, 1)
+		raiserror('O codigo do curso é invalido', 16, 1)
 	end
 
 go
@@ -439,7 +439,7 @@ as
 												end
 												else
 												begin
-															raiserror('CPF j� cadastrado', 16, 1)
+															raiserror('CPF já cadastrado', 16, 1)
 															return
 												end
 										end
@@ -458,7 +458,7 @@ as
 											end
 											else
 											begin
-													raiserror('Opera��o invalida', 16, 1)
+													raiserror('Operação invalida', 16, 1)
 													return
 											end
 							end	
@@ -569,7 +569,7 @@ as
 										end
 										else
 										begin
-													raiserror('O telefone n�o existe no banco de dados', 16, 1)
+													raiserror('O telefone não existe no banco de dados', 16, 1)
 										end
 								end
 								else
@@ -591,7 +591,7 @@ as
 										end
 										else
 										begin
-														raiserror('O telefone n�o existe no banco de dados', 16, 1)
+														raiserror('O telefone não existe no banco de dados', 16, 1)
 										end
 						end
 								
@@ -613,7 +613,7 @@ as
 						end
 						else
 						begin
-									raiserror('Opera��o invalida', 16, 1)
+									raiserror('Operação invalida', 16, 1)
 						end
 				end 
 				else
@@ -623,8 +623,9 @@ as
 		end
 		else
 		begin
-				raiserror('O CPF n�o existe na base de dados do sistema', 16, 1)
+				raiserror('O CPF não existe na base de dados do sistema', 16, 1)
 		end
+
 
 go
 --FUNCTION FN_POPULARMATRICULA
@@ -645,7 +646,7 @@ begin
 		set @codCurso = (select codCurso from Aluno where ra = @ra)
 
 		insert into @tabela (diaSemana, codDisciplina, disciplina, horasSemanais, horaInicio, statusMatricula)
-					select d.diaSemana, d.codDisciplina, d.nome, d.horasSemanais, convert(varchar(5), d.horaInicio, 108) as horaInicio, 'n�o matriculado' as statusMatricula
+					select d.diaSemana, d.codDisciplina, d.nome, d.horasSemanais, convert(varchar(5), d.horaInicio, 108) as horaInicio, 'não matriculado' as statusMatricula
 					from Disciplina d left outer join Matricula m on d.codDisciplina = m.codDisciplina
 					where m.cpf is null and d.codCurso = @codCurso
 	
@@ -744,7 +745,7 @@ as
 				begin
 							set @valida = 0
 							drop table #matriculastemp
-							raiserror('J� existe um materia cadastrada nesse intervalo de horario', 16, 1)
+							raiserror('Já existe um materia cadastrada nesse intervalo de horario', 16, 1)
 							return
 				end		
 
@@ -1011,7 +1012,7 @@ as
 			and cpf = @cpf
 
 -- procedure para listar Alunos
-create procedure sp_listaAlunos()
+create procedure sp_listaAlunos
 as
 	SELECT a.cpf, a.codCurso, a.ra, a.nome, a.nomeSocial, a.dataNascimento, a.email, a.emailCorporativo,
 				a.dataConclusao2Grau, a.instituicao2Grau, a.pontuacaoVestibular, a.posicaoVestibular, a.anoIngresso,
@@ -1026,28 +1027,102 @@ RETURNS TABLE
 AS
 RETURN
 (
-    SELECT a.nome, t.cpf, t.numero
+    SELECT a.*, t.numero
     FROM Telefone t
     JOIN Aluno a ON a.cpf = t.cpf
 );
-
+/*
 SELECT * FROM fn_listarTelefones();
 
-select * from Telefone
+select * from Telefone*/
 
 
 INSERT INTO Curso (codCurso, nome, cargaHoraria, sigla, notaEnade) 
 VALUES 
-    (1, 'An�lise e Desenvolvimento de Sistemas', 3000, 'ADS', 4),
+    (1, 'Análise e Desenvolvimento de Sistemas', 3000, 'ADS', 4),
     (2, 'Medicina', 6000, 'MED', 5),
-    (3, 'Administra��o', 3200, 'ADM', 3),
-    (4, 'Ci�ncia da Computa��o', 3500, 'CCO', 4),
+    (3, 'Administração', 3200, 'ADM', 3),
+    (4, 'Ciência da Computação', 3500, 'CCO', 4),
     (5, 'Direito', 3800, 'DIR', 4),
     (6, 'Psicologia', 3400, 'PSI', 3),
-    (7, 'Engenharia El�trica', 4200, 'ELE', 4),
+    (7, 'Engenharia Elétrica', 4200, 'ELE', 4),
     (8, 'Arquitetura e Urbanismo', 4000, 'ARQ', 4),
     (9, 'Economia', 3000, 'ECO', 3),
     (10, 'Letras', 2800, 'LET', 3);
+
+INSERT INTO Professor (codProfessor, nome) 
+VALUES 
+    (1, 'Prof. João Silva'),
+    (2, 'Prof. Maria Oliveira'),
+    (3, 'Prof. Carlos Santos'),
+    (4, 'Prof. Ana Souza'),
+    (5, 'Prof. Pedro Almeida');
+
+INSERT INTO Disciplina (codCurso, nome, horasSemanais, horaInicio, diaSemana, semestre, codProfessor)
+VALUES 
+(1, 'Cálculo I', '3:30', '13:00', 'Segunda-feira', 1, 1),
+(1, 'Álgebra Linear', '1:40', '14:50', 'Segunda-feira', 2, 2),
+(1, 'Física I', '1:40', '16:40', 'Segunda-feira', 3, 3),
+(1, 'Desenho Técnico', '1:40', '13:00', 'Segunda-feira', 4, 4),
+(1, 'Introdução à Engenharia', '3:30', '14:50', 'Segunda-feira', 5, 5),
+
+(1, 'Engenharia de Materiais', '3:30', '13:00', 'Terça-feira', 6, 1),
+(1, 'Geometria Analítica', '1:40', '14:50', 'Terça-feira', 1, 3),
+(1, 'Mecânica Geral', '1:40', '16:40', 'Terça-feira', 2, 4),
+(1, 'Topografia', '1:40', '13:00', 'Terça-feira', 3, 3),
+(1, 'Fenômenos de Transporte', '3:30', '14:50', 'Terça-feira', 4, 1),
+
+(1, 'Mecânica dos Fluidos', '3:30', '13:00', 'Quarta-feira', 5, 5),
+(1, 'Estatística Aplicada', '1:40', '14:50', 'Quarta-feira', 6, 1),
+(1, 'Desenho Assistido por Computador', '1:40', '16:40', 'Quarta-feira', 1, 2),
+(1, 'Materiais de Construção Civil', '1:40', '13:00', 'Quarta-feira', 2, 3),
+(1, 'Probabilidade e Estatística', '3:30', '14:50', 'Quarta-feira', 3, 5),
+
+(1, 'Mecânica dos Solos', '3:30', '13:00', 'Quinta-feira', 4, 4),
+(1, 'Hidráulica', '1:40', '14:50', 'Quinta-feira', 5, 1),
+(1, 'Construção Civil', '1:40', '16:40', 'Quinta-feira', 6, 3),
+(1, 'Gestão de Projetos', '1:40', '13:00', 'Quinta-feira', 1, 3),
+(1, 'Sistemas Estruturais', '3:30', '14:50', 'Quinta-feira', 2, 2),
+
+(1, 'Instalações Hidrossanitárias', '3:30', '13:00', 'Sexta-feira', 3, 3),
+(1, 'Fundamentos de Engenharia', '1:40', '14:50', 'Sexta-feira', 4, 2),
+(1, 'Saneamento Básico', '1:40', '16:40', 'Sexta-feira', 5, 1),
+(1, 'Ética Profissional', '1:40', '13:00', 'Sexta-feira', 6, 4),
+(1, 'Legislação Ambiental', '3:30', '14:50', 'Sexta-feira', 1, 5);
+
+go
+-- Inserir disciplinas para o curso de Medicina (codCurso = 2)
+INSERT INTO Disciplina (codCurso, nome, horasSemanais, horaInicio, diaSemana, semestre, codProfessor)
+VALUES 
+(2, 'Anatomia Humana', '3:30', '13:00', 'Segunda-feira', 1, 1),
+(2, 'Fisiologia', '1:40', '14:50', 'Segunda-feira', 2, 2),
+(2, 'Bioquímica', '1:40', '16:40', 'Segunda-feira', 3, 3),
+(2, 'Histologia', '1:40', '13:00', 'Segunda-feira', 4, 4),
+(2, 'Embriologia', '3:30', '14:50', 'Segunda-feira', 5, 5),
+
+(2, 'Farmacologia', '3:30', '13:00', 'Terça-feira', 6, 1),
+(2, 'Patologia Geral', '1:40', '14:50', 'Terça-feira', 1, 2),
+(2, 'Microbiologia', '1:40', '16:40', 'Terça-feira', 2, 3),
+(2, 'Genética', '1:40', '13:00', 'Terça-feira', 3, 4),
+(2, 'Imunologia', '3:30', '14:50', 'Terça-feira', 4, 5),
+
+(2, 'Semiologia', '3:30', '13:00', 'Quarta-feira', 5, 1),
+(2, 'Epidemiologia', '1:40', '14:50', 'Quarta-feira', 6, 2),
+(2, 'Parasitologia', '1:40', '16:40', 'Quarta-feira', 1, 3),
+(2, 'Bioética', '1:40', '13:00', 'Quarta-feira', 2, 4),
+(2, 'Saúde Pública', '3:30', '14:50', 'Quarta-feira', 3, 5),
+
+(2, 'Neuroanatomia', '3:30', '13:00', 'Quinta-feira', 4, 1),
+(2, 'Neurofisiologia', '1:40', '14:50', 'Quinta-feira', 5, 2),
+(2, 'Neurologia', '1:40', '16:40', 'Quinta-feira', 6, 3),
+(2, 'Psiquiatria', '1:40', '13:00', 'Quinta-feira', 1, 4),
+(2, 'Dermatologia', '3:30', '14:50', 'Quinta-feira', 2, 5),
+
+(2, 'Ginecologia', '3:30', '13:00', 'Sexta-feira', 3, 1),
+(2, 'Obstetrícia', '1:40', '14:50', 'Sexta-feira', 4, 2),
+(2, 'Pediatria', '1:40', '16:40', 'Sexta-feira', 5, 3),
+(2, 'Ortopedia', '1:40', '13:00', 'Sexta-feira', 6, 4),
+(2, 'Oftalmologia', '3:30', '14:50', 'Sexta-feira', 1, 5);
 
 delete Curso
 delete Aluno
@@ -1065,16 +1140,10 @@ declare @saida varchar(100)
 exec sp_consultaCpf '48715259889', @saida output
 print @saida
 
-@op char(1), @cpf char(11), @codCurso int, @nome varchar(150), @nomeSocial varchar(150), @dataNascimento date, @email varchar(100), @dataConclusao2Grau date,
-							@instituicao2Grau varchar(100), @pontuacaoVestibular int, @posicaoVestibular int, @anoIngresso int, @semestreIngresso int, @semestreLimite int, 
-							@saida varchar(100) output
-
-exec sp_iuAluno 'I', '11348618850', 'Kelly', 'mae', '2004-03-23', 'kelly@gmail.com', '2019-12-12',
-					'camargo', 1000, 1, 2024, 1, 1, @saida output
-
-declare @saida varchar(100)
-exec sp_iuAluno 'I', '11348618850',1, 'Kelly', 'mae', '2004-03-23', 'kelly@gmail.com', '2019-12-12',
-                'camargo', 1000, 1, 2024, 1, 1, @saida output
+select * from Disciplina
+select * from Matricula
 print @saida
 
 select * from Aluno
+
+select * from Telefone

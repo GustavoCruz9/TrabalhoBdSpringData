@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import guilherme.gustavo.TrabalhoBdSpringData.model.Aluno;
-import guilherme.gustavo.TrabalhoBdSpringData.model.Curso;
 import guilherme.gustavo.TrabalhoBdSpringData.repository.IAlunoRespository;
 
 @Controller
@@ -73,10 +72,10 @@ public class AlunoCadastrarController {
 		
 		if ((cmd.contains("Cadastrar") || cmd.contains("Alterar"))) {
 
-			Curso c = new Curso();
+//			Curso c = new Curso();
 
-			c.setCodigo(Integer.parseInt(codCurso));
-			a.setCurso(c);
+//			c.setCodigo(Integer.parseInt(codCurso));
+//			a.setCurso(c);
 
 			a.setCpf(cpf);
 			a.setNome(nome);
@@ -153,7 +152,7 @@ public class AlunoCadastrarController {
 		String saida = aRep.sp_iuAluno(
 	            "I",
 	            aluno.getCpf(),
-	            aluno.getCurso().getCodigo(),
+	            1,
 	            aluno.getNome(),
 	            aluno.getNomeSocial(),
 	            aluno.getDataNascimento().toString(),
@@ -174,7 +173,7 @@ public class AlunoCadastrarController {
 		String saida = aRep.sp_iuAluno(
 	            "U",
 	            aluno.getCpf(),
-	            aluno.getCurso().getCodigo(),
+	            1,
 	            aluno.getNome(),
 	            aluno.getNomeSocial(),
 	            aluno.getDataNascimento().toString(),

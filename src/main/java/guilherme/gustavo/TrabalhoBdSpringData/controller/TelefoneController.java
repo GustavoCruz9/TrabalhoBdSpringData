@@ -105,17 +105,17 @@ public class TelefoneController {
 	}
 	
 	private String cadastrarTelefone(Aluno a, Telefone telefoneAntigo) throws SQLException, ClassNotFoundException {
-		String saida = tRep.sp_iudTelefone("I", a.getCpf(), telefoneAntigo, a.getTelefones().get(0).getNumero());
+		String saida = tRep.sp_iudTelefone("I", a.getCpf(), telefoneAntigo.getNumero(), a.getTelefones().get(0).getNumero());
 		return saida;
 	}
 
 	private String atualizarTelefone(Aluno a, Telefone telefoneAntigo) throws SQLException, ClassNotFoundException {
-		String saida = tRep.sp_iudTelefone("U", a.getCpf(), telefoneAntigo, a.getTelefones().get(0).getNumero());
+		String saida = tRep.sp_iudTelefone("U", a.getCpf(), telefoneAntigo.getNumero(), a.getTelefones().get(0).getNumero());
 		return saida;
 	}
 
 	private String excluirTelefone(Aluno a, Telefone telefoneAntigo) throws SQLException, ClassNotFoundException {
-		String saida = tRep.sp_iudTelefone("D", a.getCpf(), telefoneAntigo, a.getTelefones().get(0).getNumero());
+		String saida = tRep.sp_iudTelefone("D", a.getCpf(), telefoneAntigo.getNumero(), a.getTelefones().get(0).getNumero());
 		return saida;
 	}
 

@@ -33,7 +33,7 @@ import lombok.ToString;
 		parameters = {
 				@StoredProcedureParameter(mode = ParameterMode.IN, name = "op", type = String.class),
 				@StoredProcedureParameter(mode = ParameterMode.IN, name = "cpf", type = String.class),
-				@StoredProcedureParameter(mode = ParameterMode.IN, name = "telefoneAntigo", type = Telefone.class),
+				@StoredProcedureParameter(mode = ParameterMode.IN, name = "telefoneAntigo", type = String.class),
 				@StoredProcedureParameter(mode = ParameterMode.IN, name = "telefoneNovo", type = String.class),
 				@StoredProcedureParameter(mode = ParameterMode.OUT, name = "saida", type = String.class)
 		}

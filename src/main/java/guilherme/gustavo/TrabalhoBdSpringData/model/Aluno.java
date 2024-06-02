@@ -63,9 +63,11 @@ public class Aluno {
 	@Column(name = "cpf", length = 11, nullable = false)
 	private String cpf;
 	
-	@ManyToOne(targetEntity = Curso.class, fetch = FetchType.LAZY)
-	@JoinColumn(name = "codCurso", nullable = false)
-	private Curso curso;
+//	@ManyToOne(targetEntity = Curso.class, fetch = FetchType.LAZY)
+//	@JoinColumn(name = "codCurso", nullable = false)
+//	private Curso curso;
+	
+	private int codCurso;
 	
 	@Column(name = "ra", length = 9, nullable = false)
 	private String ra; 
