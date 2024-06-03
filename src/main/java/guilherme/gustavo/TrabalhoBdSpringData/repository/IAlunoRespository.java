@@ -1,8 +1,9 @@
 package guilherme.gustavo.TrabalhoBdSpringData.repository;
 
-import java.time.LocalDate;
+import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.repository.query.Param;
 
@@ -30,4 +31,14 @@ public interface IAlunoRespository extends JpaRepository<Aluno, String>{
 	
 	@Procedure(name = "Aluno.sp_consultaCpf")
 	Integer sp_consultaCpf(@Param("cpf") String cpf);
+	
+	@Query(value = """
+			 	SELECT a.cpf, a.codCurso, a.ra, a.nome, a.nomeSocial, a.dataNascimento, a.email, a.emailCorporativo,
+				a.dataConclusao2Grau, a.instituicao2Grau, a.pontuacaoVestibular, a.posicaoVestibular, a.anoIngresso,
+				a.semestreIngresso, a.anoIngresso, a.anoLimite, a.semestreLimite,
+				(SELECT t1.numero FROM Telefone t1 WHERE t1.cpf = a.cpf AND t1.numero IS NOT NULL ORDER BY t1.numero OFFSET 0 ROWS FETCH NEXT 1 ROW ONLY) AS telefone1,
+				(SELECT t2.numero FROM Telefone t2 WHERE t2.cpf = a.cpf AND t2.numero IS NOT NULL ORDER BY t2.numero OFFSET 1 ROWS FETCH NEXT 1 ROW ONLY) AS telefone2
+				FROM Aluno a
+			""", nativeQuery = true)
+	List<Object[]> listarAlunos();
 }

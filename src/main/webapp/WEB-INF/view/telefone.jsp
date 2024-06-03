@@ -60,7 +60,7 @@
 			</table>
 		</form>
 		
-		<c:if test="${not empty alunos}">
+		<c:if test="${not empty telefones}">
 			<table class="tabelaAluno">
 				<thead>
 					<tr>
@@ -70,11 +70,11 @@
 					</tr>
 				</thead>
 				<tbody>
-					<c:forEach var="a" items="${alunos}">
+					<c:forEach var="t" items="${telefones}">
 						<tr>
-							<td><c:out value="${a.cpf}"></c:out>
-							<td><c:out value="${a.nome}"></c:out>
-							<td><c:out value="${a.telefones.get(0).numero}"></c:out>
+							<td><c:out value="${t.aluno.cpf}"></c:out>
+							<td><c:out value="${t.aluno.nome}"></c:out>
+							<td><c:out value="${t.numero}"></c:out>
 						</tr>
 					</c:forEach>
 				</tbody>

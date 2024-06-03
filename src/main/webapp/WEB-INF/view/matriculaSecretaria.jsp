@@ -68,15 +68,15 @@
 					</thead>
 					<tbody>
 						<c:forEach var="d" items="${disciplinas }">
-							<c:if test="${d.disciplina.diaSemana eq 'segunda-feira' }">
+							<c:if test="${d.disciplina.diaSemana eq 'Segunda-feira' }">
 									<tr>
-									<td><c:out value="${d.disciplina.codigoDisciplina}"></c:out>
+									<td><c:out value="${d.disciplina.codDisciplina}"></c:out>
 									<td><c:out value="${d.disciplina.disciplina}"></c:out>
 									<td><c:out value="${d.disciplina.horasSemanais}"></c:out>
 									<td><c:out value="${d.disciplina.horaInicio}"></c:out>
 									<td><c:out value="${d.status}"></c:out>
 									<td class="status"><input type="submit" id="botao"
-										name="botao" value="${d.disciplina.codigoDisciplina}">
+										name="botao" value="${d.disciplina.codDisciplina}">
 									</td>
 								</tr>
 							</c:if>
@@ -99,15 +99,15 @@
 					</thead>
 					<tbody>
 						<c:forEach var="d" items="${disciplinas }">
-							<c:if test="${d.disciplina.diaSemana eq 'terça-feira' }">
+							<c:if test="${d.disciplina.diaSemana eq 'Terça-feira' }">
 								<tr>
-									<td><c:out value="${d.disciplina.codigoDisciplina}"></c:out>
+									<td><c:out value="${d.disciplina.codDisciplina}"></c:out>
 									<td><c:out value="${d.disciplina.disciplina}"></c:out>
 									<td><c:out value="${d.disciplina.horasSemanais}"></c:out>
 									<td><c:out value="${d.disciplina.horaInicio}"></c:out>
 									<td><c:out value="${d.status}"></c:out>
 									<td class="status"><input type="submit" id="botao"
-										name="botao" value="${d.disciplina.codigoDisciplina}">
+										name="botao" value="${d.disciplina.codDisciplina}">
 									</td>
 							</c:if>
 						</c:forEach>
@@ -129,15 +129,15 @@
 					</thead>
 					<tbody>
 						<c:forEach var="d" items="${disciplinas }">
-							<c:if test="${d.disciplina.diaSemana eq 'quarta-feira' }">
+							<c:if test="${d.disciplina.diaSemana eq 'Quarta-feira' }">
 								<tr>
-									<td><c:out value="${d.disciplina.codigoDisciplina}"></c:out>
+									<td><c:out value="${d.disciplina.codDisciplina}"></c:out>
 									<td><c:out value="${d.disciplina.disciplina}"></c:out>
 									<td><c:out value="${d.disciplina.horasSemanais}"></c:out>
 									<td><c:out value="${d.disciplina.horaInicio}"></c:out>
 									<td><c:out value="${d.status}"></c:out>
 									<td class="status"><input type="submit" id="botao"
-										name="botao" value="${d.disciplina.codigoDisciplina}">
+										name="botao" value="${d.disciplina.codDisciplina}">
 									</td>
 							</c:if>
 						</c:forEach>
@@ -159,15 +159,15 @@
 					</thead>
 					<tbody>
 						<c:forEach var="d" items="${disciplinas }">
-							<c:if test="${d.disciplina.diaSemana eq 'quinta-feira' }">
+							<c:if test="${d.disciplina.diaSemana eq 'Quinta-feira' }">
 								<tr>
-									<td><c:out value="${d.disciplina.codigoDisciplina}"></c:out>
+									<td><c:out value="${d.disciplina.codDisciplina}"></c:out>
 									<td><c:out value="${d.disciplina.disciplina}"></c:out>
 									<td><c:out value="${d.disciplina.horasSemanais}"></c:out>
 									<td><c:out value="${d.disciplina.horaInicio}"></c:out>
 									<td><c:out value="${d.status}"></c:out>
 									<td class="status"><input type="submit" id="botao"
-										name="botao" value="${d.disciplina.codigoDisciplina}">
+										name="botao" value="${d.disciplina.codDisciplina}">
 									</td>
 							</c:if>
 						</c:forEach>
@@ -189,15 +189,15 @@
 					</thead>
 					<tbody>
 						<c:forEach var="d" items="${disciplinas }">
-							<c:if test="${d.disciplina.diaSemana eq 'sexta-feira' }">
+							<c:if test="${d.disciplina.diaSemana eq 'Sexta-feira' }">
 								<tr>
-									<td><c:out value="${d.disciplina.codigoDisciplina}"></c:out>
+									<td><c:out value="${d.disciplina.codDisciplina}"></c:out>
 									<td><c:out value="${d.disciplina.disciplina}"></c:out>
 									<td><c:out value="${d.disciplina.horasSemanais}"></c:out>
 									<td><c:out value="${d.disciplina.horaInicio}"></c:out>
 									<td><c:out value="${d.status}"></c:out>
 									<td class="status"><input type="submit" id="botao"
-										name="botao" value="${d.disciplina.codigoDisciplina}">
+										name="botao" value="${d.disciplina.codDisciplina}">
 									</td>
 							</c:if>
 						</c:forEach>

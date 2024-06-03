@@ -13,26 +13,16 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Entity
-@Table(name = "Curso")	
-public class Curso {
-
+@Table(name = "Professor")	
+public class Professor {
+		
 	@Id
-	@Column(name = "codCurso", nullable = false)
-	private int codigo;
+	@Column(name = "codProfessor", nullable = false)
+	private int codProfessor ;
 	
 	@Column(name = "nome", length = 100, nullable = false)
 	private String nome;
-	
-	@Column(name = "cargaHoraria", nullable = false)
-	private int cargaHoraria;
-	
-	@Column(name = "sigla", length = 3, nullable = false)
-	private String sigla;
-	
-	@Column(name = "notaEnade", nullable = false)
-	private int notaEnade;
-	
 }

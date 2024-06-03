@@ -40,7 +40,7 @@ public class TelefoneController {
 
 		Aluno a = new Aluno();
 		Telefone tel = new Telefone();
-		List<Aluno> alunos = new ArrayList<>();
+		Telefone telAntigo = new Telefone();
 		List<Telefone> telefones = new ArrayList<>();
 
 		if (cmd.contains("Confirmar")) {
@@ -60,36 +60,40 @@ public class TelefoneController {
 			return new ModelAndView("telefone");
 		}
 		
-		tel.setNumero(telefoneNovo);
-		telefones.add(tel);
-		a.setTelefones(telefones);
 		a.setCpf(cpf);
+		tel.setNumero(telefoneNovo);
+		tel.setAluno(a);
 
 		if (cmd.contains("Confirmar")) {
-			tel = new Telefone();
-			tel.setNumero(telefoneAntigo);
+			telAntigo.setNumero(telefoneAntigo);
 		}
 
 		try {
 			if (cmd.contains("Cadastrar")) {
-				saida = cadastrarTelefone(a, tel);
+				saida = cadastrarTelefone(tel);
 				tel = null;
 				a = null;
 			}
 			if (cmd.contains("Confirmar")) {
-				saida = atualizarTelefone(a, tel);
+				saida = atualizarTelefone(tel, telAntigo);
 				tel = null;
 				a = null;
 			}
 			if (cmd.contains("Excluir")) {
-				saida = excluirTelefone(a, tel);
+				saida = excluirTelefone(tel);
 				tel = null;
 				a = null;
 			}
-			if (cmd.contains("Listar")) {
-				alunos = listarTelefones();
-				if (alunos.isEmpty()) {
+			if (cmd.contains("Listar") && cpf.trim().isEmpty()) {
+				telefones = listarTelefones();
+				if (telefones.isEmpty()) {
 					erro = "Nao existe nenhum telefone cadastrado";
+				}
+			}
+			if (cmd.contains("Listar") && !cpf.trim().isEmpty()) {
+				telefones = listarTelefonesComParam(a);
+				if (telefones.isEmpty()) {
+					erro = "Nao existe nenhum telefone cadastrado para este Aluno";
 				}
 			}
 		} catch (SQLException | ClassNotFoundException e) {
@@ -98,31 +102,59 @@ public class TelefoneController {
 			model.addAttribute("saida", saida);
 			model.addAttribute("erro", erro);
 			model.addAttribute("aluno", a);
-			model.addAttribute("alunos", alunos);
+			model.addAttribute("telefones", telefones);
 		}
 
 		return new ModelAndView("telefone");
 	}
 	
-	private String cadastrarTelefone(Aluno a, Telefone telefoneAntigo) throws SQLException, ClassNotFoundException {
-		String saida = tRep.sp_iudTelefone("I", a.getCpf(), telefoneAntigo.getNumero(), a.getTelefones().get(0).getNumero());
+	private List<Telefone> listarTelefonesComParam(Aluno aluno) {
+		List<Object[]> objetos = tRep.listarTelefonesComParam(aluno.getCpf());
+		List<Telefone> telefones = new ArrayList<>();
+		for(Object[] row: objetos) {
+			Aluno a = new Aluno();
+			Telefone t = new Telefone();
+			
+			a.setCpf((String) row[0]);
+			a.setNome((String) row[1]);
+			t.setNumero((String) row[2]);
+			t.setAluno(a);
+			
+			telefones.add(t);
+		} 
+		return telefones;
+	}
+
+	private String cadastrarTelefone(Telefone telefone) throws SQLException, ClassNotFoundException {
+		String saida = tRep.sp_iudTelefone("I", telefone.getAluno().getCpf(), null, telefone.getNumero());
 		return saida;
 	}
 
-	private String atualizarTelefone(Aluno a, Telefone telefoneAntigo) throws SQLException, ClassNotFoundException {
-		String saida = tRep.sp_iudTelefone("U", a.getCpf(), telefoneAntigo.getNumero(), a.getTelefones().get(0).getNumero());
+	private String atualizarTelefone(Telefone telefone, Telefone telefoneAntigo) throws SQLException, ClassNotFoundException {
+		String saida = tRep.sp_iudTelefone("U", telefone.getAluno().getCpf(), telefoneAntigo.getNumero(), telefone.getNumero());
 		return saida;
 	}
 
-	private String excluirTelefone(Aluno a, Telefone telefoneAntigo) throws SQLException, ClassNotFoundException {
-		String saida = tRep.sp_iudTelefone("D", a.getCpf(), telefoneAntigo.getNumero(), a.getTelefones().get(0).getNumero());
+	private String excluirTelefone(Telefone telefone) throws SQLException, ClassNotFoundException {
+		String saida = tRep.sp_iudTelefone("D", telefone.getAluno().getCpf(), null, telefone.getNumero());
 		return saida;
 	}
 
-	private List<Aluno> listarTelefones() throws SQLException, ClassNotFoundException {
-		List<Aluno> alunos = new ArrayList<>();
-		alunos = tRep.fn_listarTelefones();
-		return alunos;
+	private List<Telefone> listarTelefones() throws SQLException, ClassNotFoundException {
+		List<Object[]> objetos = tRep.fn_listarTelefones();
+		List<Telefone> telefones = new ArrayList<>();
+		for(Object[] row: objetos) {
+			Aluno a = new Aluno();
+			Telefone t = new Telefone();
+			
+			a.setCpf((String) row[0]);
+			a.setNome((String) row[1]);
+			t.setNumero((String) row[2]);
+			t.setAluno(a);
+			
+			telefones.add(t);
+		} 
+		return telefones;
 	}
 
 }

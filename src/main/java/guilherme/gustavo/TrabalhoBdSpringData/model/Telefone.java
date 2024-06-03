@@ -38,11 +38,6 @@ import lombok.ToString;
 				@StoredProcedureParameter(mode = ParameterMode.OUT, name = "saida", type = String.class)
 		}
 )
-@NamedNativeQuery(
-		name = "Telefone.fn_listarTelefones",
-		query = "SELECT nome, cpf, numero FROM fn_listarTelefones()",
-		resultClass = Aluno.class
-	)
 public class Telefone {
 	
 	@Id

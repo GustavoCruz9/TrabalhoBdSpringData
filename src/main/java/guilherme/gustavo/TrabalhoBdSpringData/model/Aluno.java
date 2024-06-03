@@ -1,11 +1,8 @@
 package guilherme.gustavo.TrabalhoBdSpringData.model;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
@@ -63,11 +60,9 @@ public class Aluno {
 	@Column(name = "cpf", length = 11, nullable = false)
 	private String cpf;
 	
-//	@ManyToOne(targetEntity = Curso.class, fetch = FetchType.LAZY)
-//	@JoinColumn(name = "codCurso", nullable = false)
-//	private Curso curso;
-	
-	private int codCurso;
+	@ManyToOne(targetEntity = Curso.class, fetch = FetchType.LAZY)
+	@JoinColumn(name = "codCurso", nullable = false)
+	private Curso curso;
 	
 	@Column(name = "ra", length = 9, nullable = false)
 	private String ra; 
@@ -114,6 +109,7 @@ public class Aluno {
 	@Column(name = "turno", length = 10, nullable = false)
 	private String turno;
 	
-	@ElementCollection
-	List<Telefone> telefones = new ArrayList<>();
+//	@OneToMany(targetEntity = Telefone.class, fetch = FetchType.LAZY)
+//	@JoinColumn(name = "numero", nullable = false)
+//	private Telefone telefone;
 }

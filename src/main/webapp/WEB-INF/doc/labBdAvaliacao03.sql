@@ -46,27 +46,6 @@ Primary key(numero, cpf)
 Foreign key(cpf) references Aluno(cpf)
 )
 go
--- Drop function calcularHoraFinal
--- FUNCTION CalcularHoraFinal 
-create function calcularHoraFinal (@horaInicio time, @horasSemanais time)
-returns time
-as
-begin
-    declare @horaFinal time;
-    declare @horas int;
-    declare @minutos int;
-
-    set @horas = datepart(hour, @horasSemanais);
-
-    set @minutos = datepart(minute, @horasSemanais);
-
-    set @horaFinal = dateadd(hour, @horas, @horaInicio);
-    set @horaFinal = dateadd(minute, @minutos, @horaFinal);
-
-    return @horaFinal
-end
-
-go
 create table Professor (
 	codProfessor			int,
 	nome					varchar(100)
@@ -80,7 +59,7 @@ codCurso		int				not null,
 nome			varchar(100)	not null,
 horasSemanais	time			not null,
 horaInicio		time			not null,
-horaFinal as dbo.calcularHoraFinal(HoraInicio, HorasSemanais),
+horaFinal		time			not null,
 diaSemana		varchar(15)		not null,
 semestre		int				not null
 Primary key(codDisciplina)
@@ -133,10 +112,14 @@ dataDispensa			date					not null,
 statusDispensa			varchar(10)				default ('em analise'),				
 instituicao				varchar(100)			not null
 primary key(cpf, codDisciplina)
-)
+)/*
+insert into Dispensa values
+(getDate(),  'Morumbas', 'em analise', '48715259889', 1)
+
+select * from Dispensa*/
 
 go
---PROCEDURE QUE VALIDA SE O CPF EXISTE OU √â INVALIDO
+--PROCEDURE QUE VALIDA SE O CPF EXISTE OU … INVALIDO
 --drop procedure sp_consultaCpf
 create procedure sp_consultaCpf(@cpf char(11), @valido bit output)
 as
@@ -238,7 +221,7 @@ as
 	else
 	begin
 		set @validaIdade = 0
-		raiserror('A idade √© menor que 16 anos', 16, 1)
+		raiserror('A idade È menor que 16 anos', 16, 1)
 	end
 
 go
@@ -300,7 +283,7 @@ begin
 end
 
 go
---PROCEDURE QUE VALIDA SE CPF √© UNICO NO BANCO DE DADOS DO SISTEMA
+--PROCEDURE QUE VALIDA SE CPF È UNICO NO BANCO DE DADOS DO SISTEMA
 -- drop procedure sp_validaCpfDuplicado
 create procedure sp_validaCpfDuplicado(@cpf char(11), @validaCpfDuplicado bit output)
 as
@@ -320,7 +303,7 @@ as
 	end
 
 go
--- PROCEDURE PARA VERIFICA√á√ÉO DE RA
+-- PROCEDURE PARA VERIFICA«√O DE RA
 -- drop procedure sp_validaRa
 create procedure sp_validaRa(@ra char(9), @saida bit output)
 as
@@ -340,7 +323,7 @@ as
 	end
 
 go
--- PROCEDURE QUE VALIDA SE CURSO √â EXISTENTE
+-- PROCEDURE QUE VALIDA SE CURSO … EXISTENTE
 -- drop procedure sp_validaCurso
 create procedure sp_validaCurso(@codCurso int, @validaCurso bit output)
 as
@@ -353,7 +336,7 @@ as
 	else 
 	begin
 		set @validaCurso = 0
-		raiserror('O codigo do curso √© invalido', 16, 1)
+		raiserror('O codigo do curso È invalido', 16, 1)
 	end
 
 go
@@ -439,7 +422,7 @@ as
 												end
 												else
 												begin
-															raiserror('CPF j√° cadastrado', 16, 1)
+															raiserror('CPF j· cadastrado', 16, 1)
 															return
 												end
 										end
@@ -458,7 +441,7 @@ as
 											end
 											else
 											begin
-													raiserror('Opera√ß√£o invalida', 16, 1)
+													raiserror('OperaÁ„o invalida', 16, 1)
 													return
 											end
 							end	
@@ -569,7 +552,7 @@ as
 										end
 										else
 										begin
-													raiserror('O telefone n√£o existe no banco de dados', 16, 1)
+													raiserror('O telefone n„o existe no banco de dados', 16, 1)
 										end
 								end
 								else
@@ -591,7 +574,7 @@ as
 										end
 										else
 										begin
-														raiserror('O telefone n√£o existe no banco de dados', 16, 1)
+														raiserror('O telefone n„o existe no banco de dados', 16, 1)
 										end
 						end
 								
@@ -613,7 +596,7 @@ as
 						end
 						else
 						begin
-									raiserror('Opera√ß√£o invalida', 16, 1)
+									raiserror('OperaÁ„o invalida', 16, 1)
 						end
 				end 
 				else
@@ -623,7 +606,7 @@ as
 		end
 		else
 		begin
-				raiserror('O CPF n√£o existe na base de dados do sistema', 16, 1)
+				raiserror('O CPF n„o existe na base de dados do sistema', 16, 1)
 		end
 
 
@@ -637,6 +620,7 @@ returns @tabela table (
 	disciplina	varchar(100),
 	horasSemanais	time,
 	horaInicio		time,
+	horaFinal	time,
 	statusMatricula	varchar(20)
 )
 begin
@@ -645,13 +629,13 @@ begin
 
 		set @codCurso = (select codCurso from Aluno where ra = @ra)
 
-		insert into @tabela (diaSemana, codDisciplina, disciplina, horasSemanais, horaInicio, statusMatricula)
-					select d.diaSemana, d.codDisciplina, d.nome, d.horasSemanais, convert(varchar(5), d.horaInicio, 108) as horaInicio, 'n√£o matriculado' as statusMatricula
+		insert into @tabela (diaSemana, codDisciplina, disciplina, horasSemanais, horaInicio, horaFinal, statusMatricula)
+					select d.diaSemana, d.codDisciplina, d.nome, d.horasSemanais, convert(varchar(5), d.horaInicio, 108) as horaInicio, convert(varchar(5), d.horaFinal, 108) as horaFinal, 'n„o matriculado' as statusMatricula
 					from Disciplina d left outer join Matricula m on d.codDisciplina = m.codDisciplina
 					where m.cpf is null and d.codCurso = @codCurso
 	
-		insert into @tabela (diaSemana, codDisciplina, disciplina, horasSemanais, horaInicio, statusMatricula)
-					select d.diaSemana, d.codDisciplina, d.nome, d.horasSemanais, convert(varchar(5), d.horaInicio, 108) as horaInicio , m.statusMatricula
+		insert into @tabela (diaSemana, codDisciplina, disciplina, horasSemanais, horaInicio, horaFinal, statusMatricula)
+					select d.diaSemana, d.codDisciplina, d.nome, d.horasSemanais, convert(varchar(5), d.horaInicio, 108) as horaInicio , convert(varchar(5), d.horaFinal, 108) as horaFinal, m.statusMatricula
 					from Disciplina d, Matricula m
 					left join Matricula m1 on m1.cpf = m.cpf
 							  and m1.codDisciplina = m.codDisciplina
@@ -704,8 +688,10 @@ as
 
 			set @anoSemestre = dbo.fn_obterAnoSemestre()
 
-			insert into Matricula (anoSemestre, cpf, codDisciplina, dataMatricula) values
-			(@anoSemestre, @cpf, @codDisciplinaRequerida, getdate())
+			insert into Matricula (anoSemestre, cpf, codDisciplina, statusMatricula, dataMatricula) values
+			(@anoSemestre, @cpf, @codDisciplinaRequerida, 'pendente', CONVERT(VARCHAR(10), CAST(getdate() AS DATE), 103))
+
+			
 
 			set @saida = 'Matricula realizada com sucesso'
 		end
@@ -745,7 +731,7 @@ as
 				begin
 							set @valida = 0
 							drop table #matriculastemp
-							raiserror('J√° existe um materia cadastrada nesse intervalo de horario', 16, 1)
+							raiserror('J· existe um materia cadastrada nesse intervalo de horario', 16, 1)
 							return
 				end		
 
@@ -757,8 +743,8 @@ as
 		begin
 				set @anoSemestre = dbo.fn_obterAnoSemestre()
 
-				insert into Matricula (anoSemestre, cpf, codDisciplina, dataMatricula) values
-						(@anoSemestre, @cpf, @codDisciplinaRequerida, GETDATE())
+				insert into Matricula (anoSemestre, cpf, codDisciplina, statusMatricula, dataMatricula) values
+						(@anoSemestre, @cpf, @codDisciplinaRequerida, 'pendente', CONVERT(VARCHAR(10), CAST(getdate() AS DATE), 103))
 
 				set @saida = 'Matricula realizada com sucesso'
 		end
@@ -791,7 +777,7 @@ begin
 
 	set @nomeCurso = (select c.nome from aluno a, Curso c where a.codCurso = c.codCurso and a.ra = @ra)
 
-	set @dataPrimeiraMatricula = (select top 1 m.dataMatricula from aluno a, Matricula m where a.cpf = m.cpf and a.cpf = @cpf order by m.dataMatricula desc)
+	set @dataPrimeiraMatricula = (select top 1 CONVERT(VARCHAR, m.dataMatricula, 103) AS dataMatricula from aluno a, Matricula m where a.cpf = m.cpf and a.cpf = '48715259889' order by m.dataMatricula desc)
 
 	set @pontuacaoVestibular = (select pontuacaoVestibular from Aluno where ra = @ra)
 
@@ -803,7 +789,7 @@ begin
 	return
 
 end
-
+select * from Matricula
 go
 -- function que faz lista de matriculas aprovadas 
 -- drop function fn_matriculaAprovada
@@ -850,8 +836,8 @@ as
 				exec sp_validaCpfDuplicado @cpf, @validarDuplicidadeCpf output
 				if(@validarDuplicidadeCpf = 0)
 				begin
-						insert into Dispensa (cpf, codDisciplina, dataDispensa, instituicao) values 
-						(@cpf, @codDisciplina, getdate(), @instituicao)
+						insert into Dispensa (cpf, codDisciplina, dataDispensa, statusDispensa, instituicao) values 
+						(@cpf, @codDisciplina, getdate(), 'em analise', @instituicao)
 
 						set @saida = 'Solicitacao de dispensa enviada para secretaria'
 				end
@@ -1021,124 +1007,102 @@ as
 				(SELECT t2.numero FROM Telefone t2 WHERE t2.cpf = a.cpf AND t2.numero IS NOT NULL ORDER BY t2.numero OFFSET 1 ROWS FETCH NEXT 1 ROW ONLY) AS telefone2
 				FROM Aluno a
 
--- procedure para listar Telefones
-CREATE FUNCTION fn_listarTelefones()
-RETURNS TABLE
-AS
-RETURN
-(
-    SELECT a.*, t.numero
-    FROM Telefone t
-    JOIN Aluno a ON a.cpf = t.cpf
-);
-/*
-SELECT * FROM fn_listarTelefones();
-
-select * from Telefone*/
-
 
 INSERT INTO Curso (codCurso, nome, cargaHoraria, sigla, notaEnade) 
 VALUES 
-    (1, 'An√°lise e Desenvolvimento de Sistemas', 3000, 'ADS', 4),
+    (1, 'An·lise e Desenvolvimento de Sistemas', 3000, 'ADS', 4),
     (2, 'Medicina', 6000, 'MED', 5),
-    (3, 'Administra√ß√£o', 3200, 'ADM', 3),
-    (4, 'Ci√™ncia da Computa√ß√£o', 3500, 'CCO', 4),
+    (3, 'AdministraÁ„o', 3200, 'ADM', 3),
+    (4, 'CiÍncia da ComputaÁ„o', 3500, 'CCO', 4),
     (5, 'Direito', 3800, 'DIR', 4),
     (6, 'Psicologia', 3400, 'PSI', 3),
-    (7, 'Engenharia El√©trica', 4200, 'ELE', 4),
+    (7, 'Engenharia ElÈtrica', 4200, 'ELE', 4),
     (8, 'Arquitetura e Urbanismo', 4000, 'ARQ', 4),
     (9, 'Economia', 3000, 'ECO', 3),
     (10, 'Letras', 2800, 'LET', 3);
-
+go
 INSERT INTO Professor (codProfessor, nome) 
 VALUES 
-    (1, 'Prof. Jo√£o Silva'),
+    (1, 'Prof. Jo„o Silva'),
     (2, 'Prof. Maria Oliveira'),
     (3, 'Prof. Carlos Santos'),
     (4, 'Prof. Ana Souza'),
     (5, 'Prof. Pedro Almeida');
 
-INSERT INTO Disciplina (codCurso, nome, horasSemanais, horaInicio, diaSemana, semestre, codProfessor)
+go
+
+INSERT INTO Disciplina (codCurso, nome, horasSemanais, horaInicio, horaFinal, diaSemana, semestre, codProfessor)
 VALUES 
-(1, 'C√°lculo I', '3:30', '13:00', 'Segunda-feira', 1, 1),
-(1, '√Ålgebra Linear', '1:40', '14:50', 'Segunda-feira', 2, 2),
-(1, 'F√≠sica I', '1:40', '16:40', 'Segunda-feira', 3, 3),
-(1, 'Desenho T√©cnico', '1:40', '13:00', 'Segunda-feira', 4, 4),
-(1, 'Introdu√ß√£o √† Engenharia', '3:30', '14:50', 'Segunda-feira', 5, 5),
+(1, 'C·lculo I', '03:30', '13:00', '16:30', 'Segunda-feira', 1, 1),
+(1, '¡lgebra Linear', '01:40', '14:50', '16:30', 'Segunda-feira', 2, 2),
+(1, 'FÌsica I', '01:40', '16:40', '18:20', 'Segunda-feira', 3, 3),
+(1, 'Desenho TÈcnico', '01:40', '13:00', '14:40', 'Segunda-feira', 4, 4),
+(1, 'IntroduÁ„o ‡ Engenharia', '03:30', '14:50', '18:20', 'Segunda-feira', 5, 5),
 
-(1, 'Engenharia de Materiais', '3:30', '13:00', 'Ter√ßa-feira', 6, 1),
-(1, 'Geometria Anal√≠tica', '1:40', '14:50', 'Ter√ßa-feira', 1, 3),
-(1, 'Mec√¢nica Geral', '1:40', '16:40', 'Ter√ßa-feira', 2, 4),
-(1, 'Topografia', '1:40', '13:00', 'Ter√ßa-feira', 3, 3),
-(1, 'Fen√¥menos de Transporte', '3:30', '14:50', 'Ter√ßa-feira', 4, 1),
+(1, 'Engenharia de Materiais', '03:30', '13:00', '16:30', 'TerÁa-feira', 6, 1),
+(1, 'Geometria AnalÌtica', '01:40', '14:50', '16:30', 'TerÁa-feira', 1, 3),
+(1, 'Mec‚nica Geral', '01:40', '16:40', '18:20', 'TerÁa-feira', 2, 4),
+(1, 'Topografia', '01:40', '13:00', '14:40', 'TerÁa-feira', 3, 3),
+(1, 'FenÙmenos de Transporte', '03:30', '14:50', '18:20', 'TerÁa-feira', 4, 1),
 
-(1, 'Mec√¢nica dos Fluidos', '3:30', '13:00', 'Quarta-feira', 5, 5),
-(1, 'Estat√≠stica Aplicada', '1:40', '14:50', 'Quarta-feira', 6, 1),
-(1, 'Desenho Assistido por Computador', '1:40', '16:40', 'Quarta-feira', 1, 2),
-(1, 'Materiais de Constru√ß√£o Civil', '1:40', '13:00', 'Quarta-feira', 2, 3),
-(1, 'Probabilidade e Estat√≠stica', '3:30', '14:50', 'Quarta-feira', 3, 5),
+(1, 'Mec‚nica dos Fluidos', '03:30', '13:00', '16:30', 'Quarta-feira', 5, 5),
+(1, 'EstatÌstica Aplicada', '01:40', '14:50', '16:30', 'Quarta-feira', 6, 1),
+(1, 'Desenho Assistido por Computador', '01:40', '16:40', '18:20', 'Quarta-feira', 1, 2),
+(1, 'Materiais de ConstruÁ„o Civil', '01:40', '13:00', '14:40', 'Quarta-feira', 2, 3),
+(1, 'Probabilidade e EstatÌstica', '03:30', '14:50', '18:20', 'Quarta-feira', 3, 5),
 
-(1, 'Mec√¢nica dos Solos', '3:30', '13:00', 'Quinta-feira', 4, 4),
-(1, 'Hidr√°ulica', '1:40', '14:50', 'Quinta-feira', 5, 1),
-(1, 'Constru√ß√£o Civil', '1:40', '16:40', 'Quinta-feira', 6, 3),
-(1, 'Gest√£o de Projetos', '1:40', '13:00', 'Quinta-feira', 1, 3),
-(1, 'Sistemas Estruturais', '3:30', '14:50', 'Quinta-feira', 2, 2),
+(1, 'Mec‚nica dos Solos', '03:30', '13:00', '16:30', 'Quinta-feira', 4, 4),
+(1, 'Hidr·ulica', '01:40', '14:50', '16:30', 'Quinta-feira', 5, 1),
+(1, 'ConstruÁ„o Civil', '01:40', '16:40', '18:20', 'Quinta-feira', 6, 3),
+(1, 'Gest„o de Projetos', '01:40', '13:00', '14:40', 'Quinta-feira', 1, 3),
+(1, 'Sistemas Estruturais', '03:30', '14:50', '18:20', 'Quinta-feira', 2, 2),
 
-(1, 'Instala√ß√µes Hidrossanit√°rias', '3:30', '13:00', 'Sexta-feira', 3, 3),
-(1, 'Fundamentos de Engenharia', '1:40', '14:50', 'Sexta-feira', 4, 2),
-(1, 'Saneamento B√°sico', '1:40', '16:40', 'Sexta-feira', 5, 1),
-(1, '√âtica Profissional', '1:40', '13:00', 'Sexta-feira', 6, 4),
-(1, 'Legisla√ß√£o Ambiental', '3:30', '14:50', 'Sexta-feira', 1, 5);
+(1, 'InstalaÁıes Hidrossanit·rias', '03:30', '13:00', '16:30', 'Sexta-feira', 3, 3),
+(1, 'Fundamentos de Engenharia', '01:40', '14:50', '16:30', 'Sexta-feira', 4, 2),
+(1, 'Saneamento B·sico', '01:40', '16:40', '18:20', 'Sexta-feira', 5, 1),
+(1, '…tica Profissional', '01:40', '13:00', '14:40', 'Sexta-feira', 6, 4),
+(1, 'LegislaÁ„o Ambiental', '03:30', '14:50', '18:20', 'Sexta-feira', 1, 5);
+
 
 go
 -- Inserir disciplinas para o curso de Medicina (codCurso = 2)
-INSERT INTO Disciplina (codCurso, nome, horasSemanais, horaInicio, diaSemana, semestre, codProfessor)
+INSERT INTO Disciplina (codCurso, nome, horasSemanais, horaInicio, horaFinal, diaSemana, semestre, codProfessor)
 VALUES 
-(2, 'Anatomia Humana', '3:30', '13:00', 'Segunda-feira', 1, 1),
-(2, 'Fisiologia', '1:40', '14:50', 'Segunda-feira', 2, 2),
-(2, 'Bioqu√≠mica', '1:40', '16:40', 'Segunda-feira', 3, 3),
-(2, 'Histologia', '1:40', '13:00', 'Segunda-feira', 4, 4),
-(2, 'Embriologia', '3:30', '14:50', 'Segunda-feira', 5, 5),
+(2, 'Anatomia Humana', '03:30', '13:00', '16:30', 'Segunda-feira', 1, 1),
+(2, 'Fisiologia', '01:40', '14:50', '16:30', 'Segunda-feira', 2, 2),
+(2, 'BioquÌmica', '01:40', '16:40', '18:20', 'Segunda-feira', 3, 3),
+(2, 'Histologia', '01:40', '13:00', '14:40', 'Segunda-feira', 4, 4),
+(2, 'Embriologia', '03:30', '14:50', '18:20', 'Segunda-feira', 5, 5),
 
-(2, 'Farmacologia', '3:30', '13:00', 'Ter√ßa-feira', 6, 1),
-(2, 'Patologia Geral', '1:40', '14:50', 'Ter√ßa-feira', 1, 2),
-(2, 'Microbiologia', '1:40', '16:40', 'Ter√ßa-feira', 2, 3),
-(2, 'Gen√©tica', '1:40', '13:00', 'Ter√ßa-feira', 3, 4),
-(2, 'Imunologia', '3:30', '14:50', 'Ter√ßa-feira', 4, 5),
+(2, 'Farmacologia', '03:30', '13:00', '16:30', 'TerÁa-feira', 6, 1),
+(2, 'Patologia Geral', '01:40', '14:50', '16:30', 'TerÁa-feira', 1, 2),
+(2, 'Microbiologia', '01:40', '16:40', '18:20', 'TerÁa-feira', 2, 3),
+(2, 'GenÈtica', '01:40', '13:00', '14:40', 'TerÁa-feira', 3, 4),
+(2, 'Imunologia', '03:30', '14:50', '18:20', 'TerÁa-feira', 4, 5),
 
-(2, 'Semiologia', '3:30', '13:00', 'Quarta-feira', 5, 1),
-(2, 'Epidemiologia', '1:40', '14:50', 'Quarta-feira', 6, 2),
-(2, 'Parasitologia', '1:40', '16:40', 'Quarta-feira', 1, 3),
-(2, 'Bio√©tica', '1:40', '13:00', 'Quarta-feira', 2, 4),
-(2, 'Sa√∫de P√∫blica', '3:30', '14:50', 'Quarta-feira', 3, 5),
+(2, 'Semiologia', '03:30', '13:00', '16:30', 'Quarta-feira', 5, 1),
+(2, 'Epidemiologia', '01:40', '14:50', '16:30', 'Quarta-feira', 6, 2),
+(2, 'Parasitologia', '01:40', '16:40', '18:20', 'Quarta-feira', 1, 3),
+(2, 'BioÈtica', '01:40', '13:00', '14:40', 'Quarta-feira', 2, 4),
+(2, 'Sa˙de P˙blica', '03:30', '14:50', '18:20', 'Quarta-feira', 3, 5),
 
-(2, 'Neuroanatomia', '3:30', '13:00', 'Quinta-feira', 4, 1),
-(2, 'Neurofisiologia', '1:40', '14:50', 'Quinta-feira', 5, 2),
-(2, 'Neurologia', '1:40', '16:40', 'Quinta-feira', 6, 3),
-(2, 'Psiquiatria', '1:40', '13:00', 'Quinta-feira', 1, 4),
-(2, 'Dermatologia', '3:30', '14:50', 'Quinta-feira', 2, 5),
+(2, 'Neuroanatomia', '03:30', '13:00', '16:30', 'Quinta-feira', 4, 1),
+(2, 'Neurofisiologia', '01:40', '14:50', '16:30', 'Quinta-feira', 5, 2),
+(2, 'Neurologia', '01:40', '16:40', '18:20', 'Quinta-feira', 6, 3),
+(2, 'Psiquiatria', '01:40', '13:00', '14:40', 'Quinta-feira', 1, 4),
+(2, 'Dermatologia', '03:30', '14:50', '18:20', 'Quinta-feira', 2, 5),
 
-(2, 'Ginecologia', '3:30', '13:00', 'Sexta-feira', 3, 1),
-(2, 'Obstetr√≠cia', '1:40', '14:50', 'Sexta-feira', 4, 2),
-(2, 'Pediatria', '1:40', '16:40', 'Sexta-feira', 5, 3),
-(2, 'Ortopedia', '1:40', '13:00', 'Sexta-feira', 6, 4),
-(2, 'Oftalmologia', '3:30', '14:50', 'Sexta-feira', 1, 5);
+(2, 'Ginecologia', '03:30', '13:00', '16:30', 'Sexta-feira', 3, 1),
+(2, 'ObstetrÌcia', '01:40', '14:50', '16:30', 'Sexta-feira', 4, 2),
+(2, 'Pediatria', '01:40', '16:40', '18:20', 'Sexta-feira', 5, 3),
+(2, 'Ortopedia', '01:40', '13:00', '14:40', 'Sexta-feira', 6, 4),
+(2, 'Oftalmologia', '03:30', '14:50', '18:20', 'Sexta-feira', 1, 5);
+
 
 delete Curso
 delete Aluno
-INSERT INTO Aluno (
-    cpf, codCurso, ra, nome, nomeSocial, dataNascimento, email, 
-    dataConclusao2Grau, emailCorporativo, instituicao2Grau, pontuacaoVestibular, posicaoVestibular, 
-    anoIngresso, semestreIngresso, semestreLimite, anoLimite, turno
-)
-VALUES (
-    '48715259889', 1, '111111111', 'Gustavo', 'Tutu', '2004-03-23', 'gustavo@gmail.com', 
-    '2019-12-12', 'seila@gmail.com', 'camargo', 1000, 1, 2024, 1, 1, 2029, 'Vespertino'
-)
 
-declare @saida varchar(100)
-exec sp_consultaCpf '48715259889', @saida output
-print @saida
+select * from Disciplina
 
 select * from Disciplina
 select * from Matricula
@@ -1147,3 +1111,28 @@ print @saida
 select * from Aluno
 
 select * from Telefone
+
+SELECT a.cpf, a.codCurso, a.ra, a.nome, a.nomeSocial, a.dataNascimento, a.email, a.emailCorporativo,
+a.dataConclusao2Grau, a.instituicao2Grau, a.pontuacaoVestibular, a.posicaoVestibular, a.anoIngresso,
+a.semestreIngresso, a.anoIngresso, a.anoLimite, a.semestreLimite,
+(SELECT t1.numero FROM Telefone t1 WHERE t1.cpf = a.cpf AND t1.numero IS NOT NULL ORDER BY t1.numero OFFSET 0 ROWS FETCH NEXT 1 ROW ONLY) AS telefone1,
+(SELECT t2.numero FROM Telefone t2 WHERE t2.cpf = a.cpf AND t2.numero IS NOT NULL ORDER BY t2.numero OFFSET 1 ROWS FETCH NEXT 1 ROW ONLY) AS telefone2
+FROM Aluno a
+
+select diaSemana, codDisciplina, disciplina, horasSemanais,
+		horaInicio, horaFinal, statusMatricula
+from fn_popularMatricula('202416845')
+
+select d.codDisciplina, d.nome, d.horasSemanais, d.horaInicio, d.horaFinal, m.statusMatricula
+			from Disciplina d, Matricula m, Aluno a
+			where a.ra = '202416845' and d.codDisciplina = m.codDisciplina and m.cpf = a.cpf
+
+select ra, nome, nomeCurso, dataPrimeiraMatricula, pontuacaoVestibular, posicaoVestibular
+			from dbo.fn_historico('202416845')
+
+update Matricula
+set statusMatricula = 'Aprovado'
+
+
+select codDisciplina, nomeDisciplina, nomeProfessor, notaFinal, qtdFaltas
+				from fn_matriculaAprovada('202416845')
