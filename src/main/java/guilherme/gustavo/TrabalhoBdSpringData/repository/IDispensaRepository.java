@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.repository.query.Param;
 
+import guilherme.gustavo.TrabalhoBdSpringData.model.Aluno;
+import guilherme.gustavo.TrabalhoBdSpringData.model.Disciplina;
 import guilherme.gustavo.TrabalhoBdSpringData.model.Dispensa;
 import guilherme.gustavo.TrabalhoBdSpringData.model.DispensaId;
 
@@ -40,5 +42,22 @@ public interface IDispensaRepository extends JpaRepository<Dispensa, DispensaId>
 				and disp.statusDispensa like 'em analise'
 		""", nativeQuery = true)
 	List<Object[]> listarDispensas();
-			
+	
+	@Query(value = """
+			select d.nome, d.codDisciplina 
+			from Disciplina d left outer join Dispensa disp on d.codDisciplina = disp.codDisciplina
+			where d.codCurso = (select codCurso from Aluno where cpf = :cpf) and disp.cpf is null
+			""", nativeQuery = true)
+	List<Object[]> popularDisciplinas(@Param("cpf") String cpf);
+	
+	@Procedure(name = "Dispensa.sp_iDispensa")
+	String sp_iDispensa(@Param("cpf") String cpf, @Param("codDisciplina") int codDisciplina,
+			@Param("instituicao") String instituicao);
+	
+	@Query(value = """
+			select codDisciplina, dataDispensa, instituicao, statusDispensa
+			from Dispensa
+			where cpf = :cpf
+			""", nativeQuery = true)
+	List<Object[]> listarDispensasComParam(@Param("cpf") String cpf);
 }

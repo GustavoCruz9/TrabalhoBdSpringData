@@ -1,7 +1,5 @@
 package guilherme.gustavo.TrabalhoBdSpringData.model;
 
-import java.time.LocalDate;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -51,6 +49,16 @@ import lombok.ToString;
 				@StoredProcedureParameter(mode = ParameterMode.IN, name = "codDisciplina", type = Integer.class),
 				@StoredProcedureParameter(mode = ParameterMode.IN, name = "statusDispensa", type = String.class),
 				@StoredProcedureParameter(mode = ParameterMode.OUT, name = "saida", type = String.class)
+		}
+)
+@NamedStoredProcedureQuery(
+		name = "Dispensa.sp_iDispensa",
+		procedureName = "sp_iDispensa",
+		parameters = {
+				@StoredProcedureParameter(mode = ParameterMode.IN, name = "cpf", type = String.class),
+				@StoredProcedureParameter(mode = ParameterMode.IN, name = "codDisciplina", type = Integer.class),
+				@StoredProcedureParameter(mode = ParameterMode.IN, name = "instituicao", type = String.class),
+				@StoredProcedureParameter(mode = ParameterMode.OUT, name = "saida", type = String.class),
 		}
 )
 public class Dispensa {
