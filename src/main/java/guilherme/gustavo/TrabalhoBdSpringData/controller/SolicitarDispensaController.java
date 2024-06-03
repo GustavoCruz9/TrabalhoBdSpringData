@@ -125,13 +125,6 @@ public class SolicitarDispensaController {
 					saida = cadastrarDispensa(dispensa);
 					disciplinas = popularDisciplinas(aluno);
 				}
-//				if (cmd.contains("Listar Dispensas")) {
-//					dispensas = listarDispensas(cpf);
-//					disciplinas = popularDisciplinas(aluno);
-//					if (dispensas.isEmpty()) {
-//						erro = "Voce ainda nao solicitou nenhuma dispensa";
-//					}
-//				}
 			} else {
 				erro = "Tamanho de CPF invalido";
 			}

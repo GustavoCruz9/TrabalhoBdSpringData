@@ -837,7 +837,7 @@ as
 				if(@validarDuplicidadeCpf = 0)
 				begin
 						insert into Dispensa (cpf, codDisciplina, dataDispensa, statusDispensa, instituicao) values 
-						(@cpf, @codDisciplina, getdate(), 'em analise', @instituicao)
+						(@cpf, @codDisciplina, CONVERT(VARCHAR(10), CAST(getdate() AS DATE), 103), 'em analise', @instituicao)
 
 						set @saida = 'Solicitacao de dispensa enviada para secretaria'
 				end
@@ -945,12 +945,12 @@ as
 go
 -- procedure que cadastra chamada
 -- drop procedure sp_cadastraChamada
-create procedure sp_cadastraChamada (@dataChamada date, @anoSemestre int, @cpf char(11), @codDisciplina int, 
+create procedure sp_cadastraChamada (@dataChamada varchar(10), @anoSemestre int, @cpf char(11), @codDisciplina int, 
 										@presencas int, @ausencias int, @aula1 char(1), @aula2 char(1), @aula3 char(1),
 										@aula4 char(1))
 as
 	insert into ListaChamada values
-	(@dataChamada, @anoSemestre, @cpf, @codDisciplina, @presencas, @ausencias, @aula1, @aula2, @aula3, @aula4)
+	(@dataChamada, @aula1, @aula2, @aula3, @aula4, @ausencias, @presencas, @cpf, @anoSemestre, @codDisciplina)
 
 go 
 -- procedure que traz data das chamadas da disicplina selecionada 
