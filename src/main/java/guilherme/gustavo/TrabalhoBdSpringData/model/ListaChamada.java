@@ -51,6 +51,21 @@ import lombok.ToString;
 				@StoredProcedureParameter(mode = ParameterMode.IN, name = "aula4", type = String.class)
 		}
 )
+@NamedStoredProcedureQuery(
+		name = "ListaChamada.sp_atualizaChamada",
+		procedureName = "sp_atualizaChamada",
+		parameters = {
+				@StoredProcedureParameter(mode = ParameterMode.IN, name = "presenca", type = Integer.class),
+				@StoredProcedureParameter(mode = ParameterMode.IN, name = "ausencia", type = Integer.class),
+				@StoredProcedureParameter(mode = ParameterMode.IN, name = "aula1", type = String.class),
+				@StoredProcedureParameter(mode = ParameterMode.IN, name = "aula2", type = String.class),
+				@StoredProcedureParameter(mode = ParameterMode.IN, name = "aula3", type = String.class),
+				@StoredProcedureParameter(mode = ParameterMode.IN, name = "aula4", type = String.class),
+				@StoredProcedureParameter(mode = ParameterMode.IN, name = "codDisciplina", type = Integer.class),
+				@StoredProcedureParameter(mode = ParameterMode.IN, name = "cpf", type = String.class),
+				@StoredProcedureParameter(mode = ParameterMode.IN, name = "dataChamada", type = String.class),
+		}
+)
 public class ListaChamada {
 
 	@Id

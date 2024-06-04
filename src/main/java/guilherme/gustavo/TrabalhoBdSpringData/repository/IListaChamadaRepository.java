@@ -32,8 +32,14 @@ public interface IListaChamadaRepository extends JpaRepository<ListaChamada, Lis
 			 @Param("ausencia") int ausencia, @Param("aula1") String aula1, @Param("aula2") String aula2,
 			 @Param("aula3") String aula3, @Param("aula4") String aula4);
 	
+	@Procedure(name = "ListaChamada.sp_atualizaChamada")
+	void atualizaChamada (@Param("presenca") int presenca, @Param("ausencia") int ausencia, 
+			@Param("aula1") String aula1, @Param("aula2") String aula2, @Param("aula3") String aula3, 
+			@Param("aula4") String aula4, @Param("codDisciplina") int codDisciplina, @Param("cpf") String cpf,
+			@Param("dataChamada") String dataChamada);
+	
 	@Query(value = """
-			select a.nome as nomeAluno, a.ra, a.cpf, d.nome, d.codDisciplina, d.horasSemanais, d.diaSemana, m.anoSemestre
+				select a.nome as nomeAluno, a.ra, a.cpf, d.nome, d.codDisciplina, d.horasSemanais, d.diaSemana, m.anoSemestre
 				from Matricula m, Disciplina d, Aluno a
 				where a.cpf = m.cpf
 				      and m.codDisciplina = d.codDisciplina
@@ -43,4 +49,17 @@ public interface IListaChamadaRepository extends JpaRepository<ListaChamada, Lis
 					  m.statusMatricula <> 'Dispensado'
 			""", nativeQuery = true)
 	List<Object[]> buscarAlunos(@Param("codDisciplina") int codDisciplina);
+	
+	@Query(value = """
+				select lc.dataChamada, lc.anoSemestre, a.cpf, a.nome, lc.codDisciplina,  d.horasSemanais, 
+				d.nome as nomeDisciplina, d.diaSemana, lc.presenca, lc.ausencia, lc.aula1, lc.aula2, lc.aula3,
+				lc.aula4, a.ra 
+				from ListaChamada lc, Aluno a, Disciplina d
+				where lc.codDisciplina = :codDisciplina
+					and lc.anoSemestre = (dbo.fn_obterAnoSemestre())
+					and lc.dataChamada = :dataChamada
+					and lc.cpf = a.cpf
+					and d.codDisciplina = lc.codDisciplina
+			""", nativeQuery = true)
+	List<Object[]> buscarAlunosEditarChamada(@Param("codDisciplina") int codDisciplina, @Param("dataChamada") String dataChamada);
 }
