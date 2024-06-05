@@ -87,16 +87,16 @@ public class ListaChamada {
 	@Column(name = "ausencia", nullable = false)
 	private int ausencia;
 	
-	@Column(name = "aula1", length =1, nullable = false)
+	@Column(name = "aula1", length = 1, nullable = false)
 	private String aula1;
 
-	@Column(name = "aula2", length =1, nullable = false)
+	@Column(name = "aula2", length = 1, nullable = false)
 	private String aula2;
 
-	@Column(name = "aula3", length =1, nullable = false)
+	@Column(name = "aula3", length = 1, nullable = false)
 	private String aula3;
 
-	@Column(name = "aula4", length =1, nullable = false)
+	@Column(name = "aula4", length = 1, nullable = false)
 	private String aula4;
 	
 }

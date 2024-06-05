@@ -76,7 +76,7 @@ public class ChamadaController {
                 Integer.parseInt(codDisciplina);
             }catch (Exception e) {
             	try {
-					if (ValidaProfessor(p) == 1) {
+					if (validaProfessor(p) == 1) {
 						disciplinas = buscaDisciplina(p);
 					}
 				} catch (SQLException | ClassNotFoundException e1) {
@@ -96,7 +96,7 @@ public class ChamadaController {
 
 		if (cmd.contains("Nova Chamada")) {
 			try {
-				if (ValidaProfessor(p) == 1) {
+				if (validaProfessor(p) == 1) {
 					if (!codDisciplina.contains("Selecione a Disciplina")) {
 						model.addAttribute("codigoProfessor", codigoProfessor);
 						model.addAttribute("codDisciplina", codDisciplina);
@@ -117,7 +117,7 @@ public class ChamadaController {
 
 		try {
 			if (cmd.contains("Buscar Disciplinas")) {
-				if (ValidaProfessor(p) == 1) {
+				if (validaProfessor(p) == 1) {
 					disciplinas = buscaDisciplina(p);
 				}
 			}
@@ -127,7 +127,7 @@ public class ChamadaController {
 				if(ListaChamada.isEmpty()) {
 					erro = "Nao existe chamadas para esta disciplina";
 				}
-				if (ValidaProfessor(p) == 1) {
+				if (validaProfessor(p) == 1) {
 					disciplinas = buscaDisciplina(p);
 				}
 			}
@@ -187,7 +187,7 @@ public class ChamadaController {
 		return disciplinas;
 	}
 
-	private int ValidaProfessor(Professor p) throws SQLException, ClassNotFoundException {
+	private int validaProfessor(Professor p) throws SQLException, ClassNotFoundException {
 		return lRep.validaProfessor(p.getCodProfessor());
 	}
 

@@ -16,7 +16,6 @@ import org.springframework.web.servlet.ModelAndView;
 import guilherme.gustavo.TrabalhoBdSpringData.model.Aluno;
 import guilherme.gustavo.TrabalhoBdSpringData.model.Disciplina;
 import guilherme.gustavo.TrabalhoBdSpringData.model.Dispensa;
-import guilherme.gustavo.TrabalhoBdSpringData.model.Matricula;
 import guilherme.gustavo.TrabalhoBdSpringData.repository.IDispensaRepository;
 
 @Controller

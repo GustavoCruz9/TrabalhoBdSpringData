@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import guilherme.gustavo.TrabalhoBdSpringData.model.Aluno;
-import guilherme.gustavo.TrabalhoBdSpringData.model.Telefone;
 import guilherme.gustavo.TrabalhoBdSpringData.repository.IAlunoRespository;
 
 @Controller

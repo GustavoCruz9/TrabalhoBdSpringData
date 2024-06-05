@@ -2,7 +2,6 @@ package guilherme.gustavo.TrabalhoBdSpringData.model;
 
 import java.io.Serializable;
 
-import guilherme.gustavo.TrabalhoBdSpringData.model.Aluno;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

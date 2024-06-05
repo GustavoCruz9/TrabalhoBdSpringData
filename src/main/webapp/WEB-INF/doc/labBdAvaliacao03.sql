@@ -7,118 +7,6 @@ create database labBdAvaliacao03
 go
 use labBdAvaliacao03
 go
-create table Curso (
-codCurso		int				not null check(codCurso >= 0 and codCurso <= 100),
-nome			varchar(100)	not null,
-cargaHoraria	int				not null,
-sigla			varchar(3)		not null,
-notaEnade		int				not null
-Primary Key(codCurso)
-)
-go
-create table Aluno (
-cpf					char(11)		not null unique,
-codCurso			int				not null,
-ra					char(9)			not null,
-nome				varchar(150)	not null,
-nomeSocial			varchar(150)	null,
-dataNascimento		date			not null,
-email				varchar(100)	not null,
-dataConclusao2Grau	date			not null ,
-emailCorporativo	varchar(100)	not null,
-instituicao2Grau	varchar(100)	not null,
-pontuacaoVestibular	int				not null,
-posicaoVestibular	int				not null,
-anoIngresso			int				not null,
-semestreIngresso	int				not null,
-semestreLimite		int				not null,
-anoLimite			int				not null,
-turno				varchar(10)		not null
-Primary Key(cpf)
-Foreign Key(codCurso) references Curso(codCurso),
-constraint verificaDataConclusao check (dataConclusao2Grau > dataNascimento)
-)
-go
-create table Telefone (
-numero		char(11)	not null,
-cpf			char(11)	not null
-Primary key(numero, cpf)
-Foreign key(cpf) references Aluno(cpf)
-)
-go
-create table Professor (
-	codProfessor			int,
-	nome					varchar(100)
-	primary key (codProfessor)
-)
-go
-create table Disciplina (
-codDisciplina	int				not null identity(1001, 1),
-codProfessor	int				not null,
-codCurso		int				not null,
-nome			varchar(100)	not null,
-horasSemanais	time			not null,
-horaInicio		time			not null,
-horaFinal		time			not null,
-diaSemana		varchar(15)		not null,
-semestre		int				not null
-Primary key(codDisciplina)
-Foreign key(codCurso) references Curso(codCurso),
-Foreign key(codProfessor) references Professor(codProfessor)
-)
-go
--- drop table Matricula
-create table Matricula (
-anoSemestre		int				not null,
-cpf				char(11)		not null,
-codDisciplina	int				not null,
-statusMatricula	varchar(10)		not null default ('pendente'),
-nota			decimal(3,1)	null,
-dataMatricula	date			not null,
-Primary key(anoSemestre, cpf, codDisciplina),
-Foreign key(cpf) references Aluno(cpf),
-Foreign key(codDisciplina) references Disciplina(codDisciplina)
-)
-
-go
-create table Conteudo (
-codConteudo		int				not null,
-codDisciplina	int				not null,
-nome			varchar(100)	not null
-Primary key(codConteudo)
-Foreign key(codDisciplina) references Disciplina(codDisciplina)
-)
-go
---drop table ListaChamada
-create table ListaChamada (
-dataChamada				date			not null,
-anoSemestre				int				not null,
-cpf						char(11)		not null,
-codDisciplina			int				not null,
-presenca				int				not null,
-ausencia				int				not null,
-aula1					char(1)			not null,
-aula2					char(1)			not null,
-aula3					char(1)			null,
-aula4					char(1)			null
-primary key(dataChamada, anoSemestre, cpf, codDisciplina),
-foreign key (anoSemestre, cpf, codDisciplina) references Matricula (anoSemestre, cpf, codDisciplina)
-)
-go
-create table Dispensa (
-cpf						char(11)				not null references Aluno (cpf),
-codDisciplina			int						not null references Disciplina (codDisciplina),
-dataDispensa			date					not null,
-statusDispensa			varchar(10)				default ('em analise'),				
-instituicao				varchar(100)			not null
-primary key(cpf, codDisciplina)
-)/*
-insert into Dispensa values
-(getDate(),  'Morumbas', 'em analise', '48715259889', 1)
-
-select * from Dispensa*/
-
-go
 --PROCEDURE QUE VALIDA SE O CPF EXISTE OU É INVALIDO
 --drop procedure sp_consultaCpf
 create procedure sp_consultaCpf(@cpf char(11), @valido bit output)
@@ -509,8 +397,8 @@ begin
 			
 			set @codDisciplina =  (select top 1 cod from #disciplinas)
 
-			insert into Matricula (anoSemestre, cpf, codDisciplina, dataMatricula) values
-			(@anoSemestre, @cpf, @codDisciplina, getdate())
+			insert into Matricula (anoSemestre, cpf, codDisciplina, dataMatricula, statusMatricula) values
+			(@anoSemestre, @cpf, @codDisciplina, CONVERT(VARCHAR(10), CAST(getdate() AS DATE), 103), 'pendente')
 
 			delete top (1) from #disciplinas
 
@@ -731,7 +619,7 @@ as
 				begin
 							set @valida = 0
 							drop table #matriculastemp
-							raiserror('Já existe um materia cadastrada nesse intervalo de horario', 16, 1)
+							set @saida = 'Já existe um materia cadastrada nesse intervalo de horario'
 							return
 				end		
 
@@ -789,7 +677,7 @@ begin
 	return
 
 end
-select * from Matricula
+
 go
 -- function que faz lista de matriculas aprovadas 
 -- drop function fn_matriculaAprovada
@@ -996,7 +884,7 @@ as
 			and anoSemestre = (dbo.fn_obterAnoSemestre()) 
 			and codDisciplina = @codDisciplina
 			and cpf = @cpf
-
+go
 -- procedure para listar Alunos
 create procedure sp_listaAlunos
 as
@@ -1006,7 +894,7 @@ as
 				(SELECT t1.numero FROM Telefone t1 WHERE t1.cpf = a.cpf AND t1.numero IS NOT NULL ORDER BY t1.numero OFFSET 0 ROWS FETCH NEXT 1 ROW ONLY) AS telefone1,
 				(SELECT t2.numero FROM Telefone t2 WHERE t2.cpf = a.cpf AND t2.numero IS NOT NULL ORDER BY t2.numero OFFSET 1 ROWS FETCH NEXT 1 ROW ONLY) AS telefone2
 				FROM Aluno a
-
+go
 
 INSERT INTO Curso (codCurso, nome, cargaHoraria, sigla, notaEnade) 
 VALUES 
@@ -1031,108 +919,24 @@ VALUES
 
 go
 
-INSERT INTO Disciplina (codCurso, nome, horasSemanais, horaInicio, horaFinal, diaSemana, semestre, codProfessor)
-VALUES 
-(1, 'Cálculo I', '03:30', '13:00', '16:30', 'Segunda-feira', 1, 1),
-(1, 'Álgebra Linear', '01:40', '14:50', '16:30', 'Segunda-feira', 2, 2),
-(1, 'Física I', '01:40', '16:40', '18:20', 'Segunda-feira', 3, 3),
-(1, 'Desenho Técnico', '01:40', '13:00', '14:40', 'Segunda-feira', 4, 4),
-(1, 'Introdução à Engenharia', '03:30', '14:50', '18:20', 'Segunda-feira', 5, 5),
-
-(1, 'Engenharia de Materiais', '03:30', '13:00', '16:30', 'Terça-feira', 6, 1),
-(1, 'Geometria Analítica', '01:40', '14:50', '16:30', 'Terça-feira', 1, 3),
-(1, 'Mecânica Geral', '01:40', '16:40', '18:20', 'Terça-feira', 2, 4),
-(1, 'Topografia', '01:40', '13:00', '14:40', 'Terça-feira', 3, 3),
-(1, 'Fenômenos de Transporte', '03:30', '14:50', '18:20', 'Terça-feira', 4, 1),
-
-(1, 'Mecânica dos Fluidos', '03:30', '13:00', '16:30', 'Quarta-feira', 5, 5),
-(1, 'Estatística Aplicada', '01:40', '14:50', '16:30', 'Quarta-feira', 6, 1),
-(1, 'Desenho Assistido por Computador', '01:40', '16:40', '18:20', 'Quarta-feira', 1, 2),
-(1, 'Materiais de Construção Civil', '01:40', '13:00', '14:40', 'Quarta-feira', 2, 3),
-(1, 'Probabilidade e Estatística', '03:30', '14:50', '18:20', 'Quarta-feira', 3, 5),
-
-(1, 'Mecânica dos Solos', '03:30', '13:00', '16:30', 'Quinta-feira', 4, 4),
-(1, 'Hidráulica', '01:40', '14:50', '16:30', 'Quinta-feira', 5, 1),
-(1, 'Construção Civil', '01:40', '16:40', '18:20', 'Quinta-feira', 6, 3),
-(1, 'Gestão de Projetos', '01:40', '13:00', '14:40', 'Quinta-feira', 1, 3),
-(1, 'Sistemas Estruturais', '03:30', '14:50', '18:20', 'Quinta-feira', 2, 2),
-
-(1, 'Instalações Hidrossanitárias', '03:30', '13:00', '16:30', 'Sexta-feira', 3, 3),
-(1, 'Fundamentos de Engenharia', '01:40', '14:50', '16:30', 'Sexta-feira', 4, 2),
-(1, 'Saneamento Básico', '01:40', '16:40', '18:20', 'Sexta-feira', 5, 1),
-(1, 'Ética Profissional', '01:40', '13:00', '14:40', 'Sexta-feira', 6, 4),
-(1, 'Legislação Ambiental', '03:30', '14:50', '18:20', 'Sexta-feira', 1, 5);
-
+insert into Disciplina (codCurso, nome, horasSemanais, horaInicio, horaFinal, diaSemana, semestre, codProfessor, turno) values
+(1, 'Arquitetura e Organização de Computadores', '03:30', '13:00', '16:30', 'Segunda-feira', 1, 1, 'N'),
+(1, 'Laboratório Banco de Dados', '01:40', '14:50', '16:30', 'Terça-feira', 1, 1, 'T'),
+(1, 'Metodologia de Pesquisa Científico Tecnológica', '01:40', '14:50', '16:30', 'Quarta-feira', 1, 2, 'T')
 
 go
--- Inserir disciplinas para o curso de Medicina (codCurso = 2)
-INSERT INTO Disciplina (codCurso, nome, horasSemanais, horaInicio, horaFinal, diaSemana, semestre, codProfessor)
-VALUES 
-(2, 'Anatomia Humana', '03:30', '13:00', '16:30', 'Segunda-feira', 1, 1),
-(2, 'Fisiologia', '01:40', '14:50', '16:30', 'Segunda-feira', 2, 2),
-(2, 'Bioquímica', '01:40', '16:40', '18:20', 'Segunda-feira', 3, 3),
-(2, 'Histologia', '01:40', '13:00', '14:40', 'Segunda-feira', 4, 4),
-(2, 'Embriologia', '03:30', '14:50', '18:20', 'Segunda-feira', 5, 5),
 
-(2, 'Farmacologia', '03:30', '13:00', '16:30', 'Terça-feira', 6, 1),
-(2, 'Patologia Geral', '01:40', '14:50', '16:30', 'Terça-feira', 1, 2),
-(2, 'Microbiologia', '01:40', '16:40', '18:20', 'Terça-feira', 2, 3),
-(2, 'Genética', '01:40', '13:00', '14:40', 'Terça-feira', 3, 4),
-(2, 'Imunologia', '03:30', '14:50', '18:20', 'Terça-feira', 4, 5),
+insert into PesoAvaliacao (codDisciplina, tipo, peso) values
+(1, 'P1', 0.3),
+(1, 'P2', 0.5),
+(1, 'T', 0.2),
+(2, 'P1', 0.33),
+(2, 'P2', 0.33),
+(2, 'P3', 0.33),
+(3, 'Artigo Resumido', 0.3),
+(3, 'Monografia', 0.5)
 
-(2, 'Semiologia', '03:30', '13:00', '16:30', 'Quarta-feira', 5, 1),
-(2, 'Epidemiologia', '01:40', '14:50', '16:30', 'Quarta-feira', 6, 2),
-(2, 'Parasitologia', '01:40', '16:40', '18:20', 'Quarta-feira', 1, 3),
-(2, 'Bioética', '01:40', '13:00', '14:40', 'Quarta-feira', 2, 4),
-(2, 'Saúde Pública', '03:30', '14:50', '18:20', 'Quarta-feira', 3, 5),
-
-(2, 'Neuroanatomia', '03:30', '13:00', '16:30', 'Quinta-feira', 4, 1),
-(2, 'Neurofisiologia', '01:40', '14:50', '16:30', 'Quinta-feira', 5, 2),
-(2, 'Neurologia', '01:40', '16:40', '18:20', 'Quinta-feira', 6, 3),
-(2, 'Psiquiatria', '01:40', '13:00', '14:40', 'Quinta-feira', 1, 4),
-(2, 'Dermatologia', '03:30', '14:50', '18:20', 'Quinta-feira', 2, 5),
-
-(2, 'Ginecologia', '03:30', '13:00', '16:30', 'Sexta-feira', 3, 1),
-(2, 'Obstetrícia', '01:40', '14:50', '16:30', 'Sexta-feira', 4, 2),
-(2, 'Pediatria', '01:40', '16:40', '18:20', 'Sexta-feira', 5, 3),
-(2, 'Ortopedia', '01:40', '13:00', '14:40', 'Sexta-feira', 6, 4),
-(2, 'Oftalmologia', '03:30', '14:50', '18:20', 'Sexta-feira', 1, 5);
-
-
-delete Curso
-delete Aluno
-
-select * from Disciplina
-
-select * from Disciplina
-select * from Matricula
-print @saida
-
-select * from Aluno
-
-select * from Telefone
-
-SELECT a.cpf, a.codCurso, a.ra, a.nome, a.nomeSocial, a.dataNascimento, a.email, a.emailCorporativo,
-a.dataConclusao2Grau, a.instituicao2Grau, a.pontuacaoVestibular, a.posicaoVestibular, a.anoIngresso,
-a.semestreIngresso, a.anoIngresso, a.anoLimite, a.semestreLimite,
-(SELECT t1.numero FROM Telefone t1 WHERE t1.cpf = a.cpf AND t1.numero IS NOT NULL ORDER BY t1.numero OFFSET 0 ROWS FETCH NEXT 1 ROW ONLY) AS telefone1,
-(SELECT t2.numero FROM Telefone t2 WHERE t2.cpf = a.cpf AND t2.numero IS NOT NULL ORDER BY t2.numero OFFSET 1 ROWS FETCH NEXT 1 ROW ONLY) AS telefone2
-FROM Aluno a
-
-select diaSemana, codDisciplina, disciplina, horasSemanais,
-		horaInicio, horaFinal, statusMatricula
-from fn_popularMatricula('202416845')
-
-select d.codDisciplina, d.nome, d.horasSemanais, d.horaInicio, d.horaFinal, m.statusMatricula
-			from Disciplina d, Matricula m, Aluno a
-			where a.ra = '202416845' and d.codDisciplina = m.codDisciplina and m.cpf = a.cpf
-
-select ra, nome, nomeCurso, dataPrimeiraMatricula, pontuacaoVestibular, posicaoVestibular
-			from dbo.fn_historico('202416845')
-
-update Matricula
-set statusMatricula = 'Aprovado'
-
-
-select codDisciplina, nomeDisciplina, nomeProfessor, notaFinal, qtdFaltas
-				from fn_matriculaAprovada('202416845')
+insert into Avaliacao values 
+(0, '41707740860', 20241, 1, 1),
+(0, '41707740860', 20241, 1, 2),
+(0, '41707740860', 20241, 1, 3)

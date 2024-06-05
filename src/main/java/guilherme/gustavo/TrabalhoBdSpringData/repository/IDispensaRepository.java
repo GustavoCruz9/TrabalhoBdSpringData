@@ -7,8 +7,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.repository.query.Param;
 
-import guilherme.gustavo.TrabalhoBdSpringData.model.Aluno;
-import guilherme.gustavo.TrabalhoBdSpringData.model.Disciplina;
 import guilherme.gustavo.TrabalhoBdSpringData.model.Dispensa;
 import guilherme.gustavo.TrabalhoBdSpringData.model.DispensaId;
 

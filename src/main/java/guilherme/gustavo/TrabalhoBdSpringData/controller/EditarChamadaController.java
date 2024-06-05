@@ -44,7 +44,6 @@ public class EditarChamadaController {
 		String erro = "";
 		String horasSemanais = "";
 
-		List<Matricula> matriculas = new ArrayList<>();
 		List<ListaChamada> listaChamada = new ArrayList<>();
 		Disciplina d = new Disciplina();
 
