@@ -42,6 +42,6 @@ public class Avaliacao {
 	private PesoAvaliacao pesoAvaliacao;
 	
 	@Column(name = "nota", nullable = false)
-	private double nota;
+	private float nota;
 	
 }

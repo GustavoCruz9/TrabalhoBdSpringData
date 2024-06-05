@@ -32,7 +32,7 @@
 		</div>
 
 		<form action="notas" method="post" class="formDispensa1">
-				<input type="submit" id="botao"	name="botao" value="Confirmar"/>
+				<input type="submit" id="botao"	name="botao" value="Buscar Aluno"/>
 		</form>
 
 	</main>
