@@ -20,13 +20,30 @@ public interface INotasRepository extends JpaRepository<Avaliacao, Integer> {
 				  and a.cpf = :cpf
 				  and av.codDisciplina = :codDisciplina
 			""", nativeQuery = true)
-	List<Object[]> buscaNotas(@Param("cpf") String cpf, @Param("codDisciplina") int codDisciplina);
+	List<Object[]> buscaNotasComParam(@Param("cpf") String cpf, @Param("codDisciplina") int codDisciplina);
+	
+	@Query(value = """
+			select a.nome, a.cpf, pav.tipo ,av.nota 
+			from Aluno a, Avaliacao av, PesoAvaliacao pav 
+			where av.cpf = a.cpf 
+				  and av.codigoPesoAvaliacao = pav.codigo
+				  and av.codDisciplina = :codDisciplina
+				  order by a.cpf, pav.tipo asc
+			""", nativeQuery = true)
+	List<Object[]> buscaNotas(@Param("codDisciplina") int codDisciplina);
 
 	
 	@Query(value = """
-			select * from PesoAvaliacao where codDisciplina = :codDisciplina
+			select * from PesoAvaliacao where codDisciplina = :codDisciplina order by tipo asc
 			""", nativeQuery = true)
 	List<Object[]> buscaPesoAvaliacao(@Param("codDisciplina") int codDisciplina);
+	
+	@Query(value = """
+			select a.codigo from Avaliacao a, PesoAvaliacao pav 
+			where pav.codigo = a.codigoPesoAvaliacao and a.codDisciplina = :codDisciplina and a.cpf = :cpf
+			order by pav.tipo
+			""", nativeQuery = true)
+	List<Object[]> buscaCodigosAvaliacoes(@Param("codDisciplina") int codDisciplina, @Param("cpf") String cpf);
 	
 	@Modifying
     @Transactional
