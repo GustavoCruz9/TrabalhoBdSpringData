@@ -73,6 +73,7 @@ public class NotasController {
 		String nota2 = param.get("nota2");
 		String nota3 = param.get("nota3");
 		String statusSelect = param.get("statusSelect");
+		String cpfSelect = param.get("cpfSelect");
 
 		
 
@@ -92,8 +93,9 @@ public class NotasController {
 		if(cmd == null) {
 			cmd = "";
 		}
+
 		
-		if (cmd.equalsIgnoreCase("Buscar Disciplinas")) {
+ 		if (cmd.equalsIgnoreCase("Buscar Disciplinas")) {
 			if (codigoProfessor.trim().isEmpty()) {
 				erro = "Por favor, informe o codigo do Professor";
 			}
@@ -114,13 +116,21 @@ public class NotasController {
 			professor.setCodProfessor(Integer.parseInt(codigoProfessor));
 		}
 
-		if ((cmd.equalsIgnoreCase("Confirmar") || cmd.equalsIgnoreCase("Buscar Aluno"))) {
+		if ((cmd.equalsIgnoreCase("Confirmar") || cmd.equalsIgnoreCase("Buscar Aluno")) ||
+			 cmd.equalsIgnoreCase("Lancar Notas")) {
 			disciplina.setCodDisciplina(Integer.parseInt(codDisciplina));
 			professor.setCodProfessor(Integer.parseInt(codigoProfessor));
-			aluno.setCpf(cpf);
+			if(cpfSelect == null) {
+				aluno.setCpf(cpf);
+			}else {
+				aluno.setCpf(cpfSelect);
+				cpf = cpfSelect;
+			}
+			
 		}
 		
 		if(statusSelect != null && statusSelect.equalsIgnoreCase("true")){
+			professor.setCodProfessor(Integer.parseInt(codigoProfessor));
 			disciplina.setCodDisciplina(Integer.parseInt(codDisciplina));
 		}
 
@@ -156,8 +166,8 @@ public class NotasController {
 				}
 			}
 
-			if (cmd.equalsIgnoreCase("Buscar Aluno")) {
-				if (cpf.length() == 11) {
+			if (cmd.equalsIgnoreCase("Buscar Aluno") || cmd.equalsIgnoreCase("Lancar Notas")) {
+				if (aluno.getCpf().length() == 11) {
 					avaliacoes = buscaNotasComParam(aluno, disciplina);
 				}
 			}
@@ -169,9 +179,10 @@ public class NotasController {
 				
 			}
 			
-			if(statusSelect != null && statusSelect.equalsIgnoreCase("true")) {
+			if((statusSelect != null && statusSelect.equalsIgnoreCase("true"))) {
 				avaliacoes = buscaNotas(disciplina);
 				alunosAvaliacaoObject = organizaTabelaNotas(avaliacoes); 
+				avaliacoes = new ArrayList<>();
 			}
 
 		} catch (SQLException | ClassNotFoundException e1) {
@@ -181,9 +192,10 @@ public class NotasController {
 			model.addAttribute("saida", saida);
 			model.addAttribute("codigoProfessor", codigoProfessor);
 			model.addAttribute("cpf", cpf);
+			model.addAttribute("cpfSelect", cpfSelect);
 			model.addAttribute("disciplinas", disciplinas);
 			model.addAttribute("avaliacoes", avaliacoes);
-			model.addAttribute("codDisciplina", codDisciplina);
+			model.addAttribute("disciplina", disciplina);
 			model.addAttribute("alunosAvaliacaoObject", alunosAvaliacaoObject);
 		}
 
@@ -220,7 +232,7 @@ public class NotasController {
 	private List<Avaliacao> buscaNotas(Disciplina disciplina) {
 		List<Object[]> objetos = new ArrayList<>();
 		List<Avaliacao> avaliacoes = new ArrayList<>();
-		objetos = nRep.buscaNotas(disciplina.getCodDisciplina());
+		objetos = nRep.buscaNotas(disciplina.getCodDisciplina(), Integer.parseInt(anoSemestre()));
 		
 		for (Object[] row : objetos) {
 			Avaliacao avaliacao = new Avaliacao();
@@ -267,7 +279,8 @@ public class NotasController {
 		boolean status = false;
 		List<Object[]> objetos = new ArrayList<>();
 		List<Avaliacao> avaliacoes = new ArrayList<>();
-		objetos = nRep.buscaNotasComParam(aluno.getCpf(), disciplina.getCodDisciplina());
+		objetos = nRep.buscaNotasComParam(aluno.getCpf(), disciplina.getCodDisciplina(), 
+										  Integer.parseInt(anoSemestre()));
 		if (objetos.isEmpty()) {
 			List<PesoAvaliacao> tiposAvaliacao = new ArrayList<>();
 
@@ -287,7 +300,8 @@ public class NotasController {
 
 		if(!objetos.isEmpty() || status == true) {
 			objetos = new ArrayList<>();
-			objetos = nRep.buscaNotasComParam(aluno.getCpf(), disciplina.getCodDisciplina());
+			objetos = nRep.buscaNotasComParam(aluno.getCpf(), disciplina.getCodDisciplina(),
+											  Integer.parseInt(anoSemestre()));
 			
 			for (Object[] row : objetos) {
 				Avaliacao avaliacao = new Avaliacao();

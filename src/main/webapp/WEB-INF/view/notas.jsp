@@ -42,23 +42,28 @@
                         <div class="conteudo">
                             <input type="text" pattern="[0-9]*" name="codigoProfessor"
                                 id="codigoProfessor" placeholder="Codigo Professor"
-                                value="${param.codigoProfessor}"> <input type="submit"
-                                value="Buscar Disciplinas" id="botao" name="botao">
+                                value="${param.codigoProfessor}"/> <input type="submit"
+                                value="Buscar Disciplinas" id="botao" name="botao"/>
                         </div>
                         <div class="conteudo">
                             <select name="codDisciplina" id="codDisciplina" onchange="submitForm()">
-						        <option value="" disabled>Selecione a Disciplina</option>
+						        <option disabled ${disciplina.disciplina == null ? 'selected' : '' }>Selecione a Disciplina</option>
 						        <c:forEach var="d" items="${disciplinas}">
-						            <option value="${d.codDisciplina}" <c:if test="${d.codDisciplina eq param.codDisciplina}">selected</c:if>>
+						            <option value="${d.codDisciplina}"
+						            ${disciplina.codDisciplina != null && disciplina.codDisciplina == d.codDisciplina ? 'selected' : ''}>
 						                <c:out value="${d.disciplina}" />
 						            </option>
 						        </c:forEach>
 						    </select>
-                            <input type="hidden" name="selectedCodDisciplina" id="selectedCodDisciplina" value="">	
+                            <input type="hidden" name="codDisciplina" id="codDisciplina" value="${disciplina.codDisciplina}">	
+									<input type="hidden" name="codigoProfessor" id="codigoProfessor"
+									value="${param.codigoProfessor}">
+									<input type="hidden" name="cpf" id="cpf"
+									value="<c:out value="${cpf}"></c:out>">	
                         </div>
                         <div class="conteudo">
                             <input type="text" pattern="[0-9]*" name="cpf" id="cpf"
-                                placeholder="CPF do Aluno" value="${param.cpf}"> <input type="submit"
+                                placeholder="CPF do Aluno" value="${param.cpf}"/> <input type="submit"
                                 value="Buscar Aluno" id="botao" name="botao">
                         </div>
                     </div>
@@ -111,7 +116,25 @@
                         name="botao">
                 </div>
             </div>
-
+            
+            <script>
+		        function submitForm() {
+		            var statusSelect = true;
+		
+		            var input = document.createElement("input");
+		            input.type = "hidden";
+		            input.name = "statusSelect";
+		            input.value = statusSelect;
+		
+		            var form = document.getElementById("DisciplinaForm");
+		            form.appendChild(input);
+		
+		            form.submit();              
+		            
+		        }
+		    </script>
+            
+            </form>
 
             <div class="tabelaAluno">
                 <table>
@@ -147,42 +170,26 @@
                             <c:if test="${fn:length(avaliacoesAluno) < 2}">
                                 <td></td>
                             </c:if>
-                            <td><input type="submit" value="Lançar Notas" id="botao" name="botao"></td>
+                            <td>
+                            	<form action="notas" method="post">
+                            		<input type="submit" value="Lancar Notas" id="botao" name="botao" onclick="setCpfAndSubmit('<c:out value='${aluno.cpf}' />')">
+                            		<input type="hidden" name="cpfSelect" id="cpfSelect"
+									value="<c:out value="${aluno.cpf}" />">
+									<input type="hidden" name="codigoProfessor" id="codigoProfessor"
+									value="${param.codigoProfessor}">
+									<input type="hidden" name="cpf" id="cpf"
+									value="${param.cpf}">	
+									<input type="hidden" name="codDisciplina" id="codDisciplina" value="${disciplina.codDisciplina}">		
+								</form>
+                            </td>
                         </tr>
                     </c:otherwise>
                 </c:choose>
             </c:forEach>
                     </tbody>
                 </table>
-            </div>
-            
-            <input type="hidden" name="codigoProfessor" id="codigoProfessor"
-				value="${param.codigoProfesso}"> <br>
-			
-			<input type="hidden" name="cpf" id="cpf"
-				value="${param.cpf}"> <br>
-				
-			<script>
-        function submitForm() {
-            var statusSelect = true;
-
-            // Create a hidden input to hold the statusSelect value
-            var input = document.createElement("input");
-            input.type = "hidden";
-            input.name = "statusSelect";
-            input.value = statusSelect;
-
-            // Append the input to the form
-            var form = document.getElementById("DisciplinaForm");
-            form.appendChild(input);
-
-            // Submit the form
-            form.submit();
-        }
-    </script>
-				
-            
-        </form>
+            </div>            
+            				
     </main>
 </body>
 </html>

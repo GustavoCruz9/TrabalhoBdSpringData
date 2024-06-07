@@ -197,3 +197,11 @@ th {
     color: black;
     text-align: center;
 }
+
+table form {
+    width: 200px;
+}
+
+table input[type = "submit"] {
+    width: 130px;
+}

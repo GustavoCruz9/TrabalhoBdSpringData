@@ -14,23 +14,35 @@ public interface INotasRepository extends JpaRepository<Avaliacao, Integer> {
 	
 	@Query(value = """
 			select a.nome, a.cpf, pav.tipo ,av.nota 
-			from Aluno a, Avaliacao av, PesoAvaliacao pav 
-			where av.cpf = a.cpf 
+			from Aluno a, Avaliacao av, PesoAvaliacao pav, Matricula m
+			where av.cpf = a.cpf
+				  and a.cpf = m.cpf
 				  and av.codigoPesoAvaliacao = pav.codigo
-				  and a.cpf = :cpf
+				  and av.anoSemestre = m.anoSemestre
+				  and av.cpf = :cpf
+				  and m.statusMatricula = 'pendente'
+				  and av.codDisciplina = m.codDisciplina
+				  and av.anoSemestre = :anoSemestre
 				  and av.codDisciplina = :codDisciplina
+				  order by pav.tipo asc
 			""", nativeQuery = true)
-	List<Object[]> buscaNotasComParam(@Param("cpf") String cpf, @Param("codDisciplina") int codDisciplina);
+	List<Object[]> buscaNotasComParam(@Param("cpf") String cpf, @Param("codDisciplina") int codDisciplina,
+									 @Param("anoSemestre") int anoSemestre);
 	
 	@Query(value = """
 			select a.nome, a.cpf, pav.tipo ,av.nota 
-			from Aluno a, Avaliacao av, PesoAvaliacao pav 
+			from Aluno a, Avaliacao av, PesoAvaliacao pav, Matricula m
 			where av.cpf = a.cpf 
+				  and a.cpf = m.cpf
 				  and av.codigoPesoAvaliacao = pav.codigo
+				  and av.anoSemestre = m.anoSemestre
+				  and m.statusMatricula = 'pendente'
+				  and av.codDisciplina = m.codDisciplina
+				  and av.anoSemestre = :anoSemestre
 				  and av.codDisciplina = :codDisciplina
 				  order by a.cpf, pav.tipo asc
 			""", nativeQuery = true)
-	List<Object[]> buscaNotas(@Param("codDisciplina") int codDisciplina);
+	List<Object[]> buscaNotas(@Param("codDisciplina") int codDisciplina, @Param("anoSemestre") int anoSemestre);
 
 	
 	@Query(value = """
