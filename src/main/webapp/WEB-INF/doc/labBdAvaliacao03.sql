@@ -372,10 +372,14 @@ begin
 				@codCurso int,
 				@cpf char(11),
 				@codDisciplina int,
-				@anoSemestre int
+				@anoSemestre int,
+				@codPesoAvaliacao int,
+				@tamanhoPeso int
 
 		set @codDisciplina = 0 
-				
+		
+		set @codPesoAvaliacao = 0 
+		
 		set @codCurso = (select codCurso from inserted)
 
 		set @i = (select count(codDisciplina) from Disciplina where semestre = 1 and codCurso = @codCurso)
@@ -392,6 +396,11 @@ begin
 		insert into #disciplinas (cod) 
 			   select codDisciplina from Disciplina where semestre = 1 and codCurso = @codCurso
 
+		create table #pesos(
+			cod		int 
+		)
+
+
 		while(@i > 0)
 		begin
 			
@@ -399,6 +408,25 @@ begin
 
 			insert into Matricula (anoSemestre, cpf, codDisciplina, dataMatricula, statusMatricula) values
 			(@anoSemestre, @cpf, @codDisciplina, CONVERT(VARCHAR(10), CAST(getdate() AS DATE), 103), 'pendente')
+
+			insert into #pesos (cod)
+				   select codigo from PesoAvaliacao where codDisciplina = @codDisciplina order by tipo asc
+
+			set @tamanhoPeso = (select count(cod) from #pesos)
+
+			while(@tamanhoPeso > 0)
+			begin
+
+			set @codPesoAvaliacao =  (select top 1 cod from #pesos)
+
+			insert into Avaliacao values 
+			(0, @cpf, @anoSemestre, @codDisciplina, @codPesoAvaliacao)
+
+			delete top (1) from #pesos
+
+			set @tamanhoPeso = @tamanhoPeso - 1
+
+			end
 
 			delete top (1) from #disciplinas
 
@@ -935,6 +963,8 @@ insert into PesoAvaliacao (codDisciplina, tipo, peso) values
 (2, 'P3', 0.33),
 (3, 'Artigo Resumido', 0.3),
 (3, 'Monografia', 0.5)
+
+go
 
 insert into Avaliacao values 
 (0, '41707740860', 20241, 1, 1),

@@ -51,6 +51,11 @@ public interface INotasRepository extends JpaRepository<Avaliacao, Integer> {
 	List<Object[]> buscaPesoAvaliacao(@Param("codDisciplina") int codDisciplina);
 	
 	@Query(value = """
+			select count(codigo) from PesoAvaliacao where codDisciplina = :codDisciplina
+			""", nativeQuery = true)
+	int buscaQtdPesos(@Param("codDisciplina") int codDisciplina);
+	
+	@Query(value = """
 			select a.codigo from Avaliacao a, PesoAvaliacao pav 
 			where pav.codigo = a.codigoPesoAvaliacao and a.codDisciplina = :codDisciplina and a.cpf = :cpf
 			order by pav.tipo

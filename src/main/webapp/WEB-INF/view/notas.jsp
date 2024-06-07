@@ -61,11 +61,13 @@
 									<input type="hidden" name="cpf" id="cpf"
 									value="<c:out value="${cpf}"></c:out>">	
                         </div>
+                        <!--  
                         <div class="conteudo">
                             <input type="text" pattern="[0-9]*" name="cpf" id="cpf"
                                 placeholder="CPF do Aluno" value="${param.cpf}"/> <input type="submit"
                                 value="Buscar Aluno" id="botao" name="botao">
                         </div>
+                        -->
                     </div>
 
                     <div class="direita">
@@ -144,7 +146,7 @@
                             <th>Nome</th>
                             <th>Nota 1</th>
                             <th>Nota 2</th>
-                            <c:if test="${fn:length(avaliacoes) > 2}">
+                            <c:if test="${qtdNotas > 2}">
                                 <th>Nota 3</th>
                             </c:if>
                             <th>Ação</th>
@@ -164,12 +166,6 @@
                             <c:forEach var="av" items="${avaliacoesAluno}" varStatus="avStatus">
                                 <td><c:out value="${av.nota}" /></td>
                             </c:forEach>
-                            <c:if test="${fn:length(avaliacoesAluno) < 3}">
-                                <td></td>
-                            </c:if>
-                            <c:if test="${fn:length(avaliacoesAluno) < 2}">
-                                <td></td>
-                            </c:if>
                             <td>
                             	<form action="notas" method="post">
                             		<input type="submit" value="Lancar Notas" id="botao" name="botao" onclick="setCpfAndSubmit('<c:out value='${aluno.cpf}' />')">

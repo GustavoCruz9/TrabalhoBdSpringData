@@ -34,31 +34,6 @@ public class NotasController {
 
 	@RequestMapping(name = "notas", value = "/notas", method = RequestMethod.GET)
 	public ModelAndView notasGet(@RequestParam Map<String, String> param, ModelMap model) {
-
-//		String codigoProfessor = param.get("codigoProfessor");
-//
-//		if (codigoProfessor != null) {
-//			Professor professor = new Professor();
-//			List<Disciplina> disciplinas = new ArrayList<>();
-//			String erro = "";
-//			String saida = "";
-//			professor.setCodProfessor(Integer.parseInt(codigoProfessor));
-//			try {
-//				if (validaProfessor(professor) == 1) {
-//					disciplinas = buscaDisciplina(professor);
-//				}
-//			} catch (SQLException | ClassNotFoundException e1) {
-//				erro = e1.getMessage();
-//			} finally {
-//				model.addAttribute("erro", erro);
-//				model.addAttribute("saida", saida);
-//				model.addAttribute("disciplinas", disciplinas);
-//				model.addAttribute("codigoProfessor", codigoProfessor);
-//
-//			}
-//		}
-		// fazer listar todos os alunos com suas notas e ra quando ele selecionar a
-		// disicplina
 		return new ModelAndView("notas");
 	}
 
@@ -75,27 +50,25 @@ public class NotasController {
 		String statusSelect = param.get("statusSelect");
 		String cpfSelect = param.get("cpfSelect");
 
-		
-
 		List<Disciplina> disciplinas = new ArrayList<>();
 		List<Avaliacao> avaliacoes = new ArrayList<>();
 		List<PesoAvaliacao> tiposAvaliacao = new ArrayList<>();
-		List<Object> alunosAvaliacaoObject = new ArrayList<>();	
+		List<Object> alunosAvaliacaoObject = new ArrayList<>();
 		Professor professor = new Professor();
 		Disciplina disciplina = new Disciplina();
 		Avaliacao avaliacao = new Avaliacao();
 		Matricula matricula = new Matricula();
 		PesoAvaliacao pesoAvaliacao = new PesoAvaliacao();
 		Aluno aluno = new Aluno();
+		int qtdNotas = 0;
 		String erro = "";
 		String saida = "";
-		
-		if(cmd == null) {
+
+		if (cmd == null) {
 			cmd = "";
 		}
 
-		
- 		if (cmd.equalsIgnoreCase("Buscar Disciplinas")) {
+		if (cmd.equalsIgnoreCase("Buscar Disciplinas")) {
 			if (codigoProfessor.trim().isEmpty()) {
 				erro = "Por favor, informe o codigo do Professor";
 			}
@@ -116,20 +89,20 @@ public class NotasController {
 			professor.setCodProfessor(Integer.parseInt(codigoProfessor));
 		}
 
-		if ((cmd.equalsIgnoreCase("Confirmar") || cmd.equalsIgnoreCase("Buscar Aluno")) ||
-			 cmd.equalsIgnoreCase("Lancar Notas")) {
+		if ((cmd.equalsIgnoreCase("Confirmar") || cmd.equalsIgnoreCase("Buscar Aluno"))
+				|| cmd.equalsIgnoreCase("Lancar Notas")) {
 			disciplina.setCodDisciplina(Integer.parseInt(codDisciplina));
 			professor.setCodProfessor(Integer.parseInt(codigoProfessor));
-			if(cpfSelect == null) {
+			if (cpfSelect == null) {
 				aluno.setCpf(cpf);
-			}else {
+			} else {
 				aluno.setCpf(cpfSelect);
 				cpf = cpfSelect;
 			}
-			
+
 		}
-		
-		if(statusSelect != null && statusSelect.equalsIgnoreCase("true")){
+
+		if (statusSelect != null && statusSelect.equalsIgnoreCase("true")) {
 			professor.setCodProfessor(Integer.parseInt(codigoProfessor));
 			disciplina.setCodDisciplina(Integer.parseInt(codDisciplina));
 		}
@@ -174,15 +147,15 @@ public class NotasController {
 
 			if (cmd.equalsIgnoreCase("Confirmar")) {
 				saida = cadastrarAvaliacoes(avaliacoes);
-				cpf = null;
 				avaliacoes = new ArrayList<>();
-				
 			}
-			
-			if((statusSelect != null && statusSelect.equalsIgnoreCase("true"))) {
-				avaliacoes = buscaNotas(disciplina);
-				alunosAvaliacaoObject = organizaTabelaNotas(avaliacoes); 
-				avaliacoes = new ArrayList<>();
+
+			if ((statusSelect != null && statusSelect.equalsIgnoreCase("true")) || cmd.equalsIgnoreCase("Confirmar")
+				 || cmd.equalsIgnoreCase("Lancar Notas") || cmd.equalsIgnoreCase("Buscar Aluno")) {
+				List<Avaliacao> tabelaAvaliacoes = new ArrayList<>();
+				tabelaAvaliacoes = buscaNotas(disciplina);
+				alunosAvaliacaoObject = organizaTabelaNotas(tabelaAvaliacoes);
+				qtdNotas = nRep.buscaQtdPesos(disciplina.getCodDisciplina());
 			}
 
 		} catch (SQLException | ClassNotFoundException e1) {
@@ -196,6 +169,7 @@ public class NotasController {
 			model.addAttribute("disciplinas", disciplinas);
 			model.addAttribute("avaliacoes", avaliacoes);
 			model.addAttribute("disciplina", disciplina);
+			model.addAttribute("qtdNotas", qtdNotas);
 			model.addAttribute("alunosAvaliacaoObject", alunosAvaliacaoObject);
 		}
 
@@ -204,28 +178,28 @@ public class NotasController {
 
 	private List<Object> organizaTabelaNotas(List<Avaliacao> avaliacoes) {
 		List<Object> objetos = new ArrayList<>();
-        List<String> cpfsProcessados = new ArrayList<>();
+		List<String> cpfsProcessados = new ArrayList<>();
 
-        for (Avaliacao a : avaliacoes) {
-            Aluno aluno = a.getMatricula().getAluno();
-            String cpf = aluno.getCpf();
+		for (Avaliacao a : avaliacoes) {
+			Aluno aluno = a.getMatricula().getAluno();
+			String cpf = aluno.getCpf();
 
-            if (!cpfsProcessados.contains(cpf)) {
-                objetos.add(aluno);
-                cpfsProcessados.add(cpf);
+			if (!cpfsProcessados.contains(cpf)) {
+				objetos.add(aluno);
+				cpfsProcessados.add(cpf);
 
-                List<Avaliacao> avaliacoesAluno = new ArrayList<>();
-                for (Avaliacao av : avaliacoes) {
-                    if (av.getMatricula().getAluno().getCpf().equals(cpf)) {
-                        Avaliacao avaliacaoSimplificada = new Avaliacao();
-                        avaliacaoSimplificada.setNota(av.getNota());
-                        avaliacoesAluno.add(avaliacaoSimplificada);
-                    }
-                }
-                objetos.add(avaliacoesAluno);
-            }
-        }
-		
+				List<Avaliacao> avaliacoesAluno = new ArrayList<>();
+				for (Avaliacao av : avaliacoes) {
+					if (av.getMatricula().getAluno().getCpf().equals(cpf)) {
+						Avaliacao avaliacaoSimplificada = new Avaliacao();
+						avaliacaoSimplificada.setNota(av.getNota());
+						avaliacoesAluno.add(avaliacaoSimplificada);
+					}
+				}
+				objetos.add(avaliacoesAluno);
+			}
+		}
+
 		return objetos;
 	}
 
@@ -233,23 +207,23 @@ public class NotasController {
 		List<Object[]> objetos = new ArrayList<>();
 		List<Avaliacao> avaliacoes = new ArrayList<>();
 		objetos = nRep.buscaNotas(disciplina.getCodDisciplina(), Integer.parseInt(anoSemestre()));
-		
+
 		for (Object[] row : objetos) {
 			Avaliacao avaliacao = new Avaliacao();
 			PesoAvaliacao pesoAvaliacao = new PesoAvaliacao();
 			Matricula matricula = new Matricula();
 			Aluno aluno = new Aluno();
-			
+
 			aluno.setNome((String) row[0].toString());
 			aluno.setCpf((String) row[1].toString());
 			matricula.setAluno(aluno);
-			
+
 			pesoAvaliacao.setTipo((String) row[2].toString());
 			avaliacao.setNota(((Number) row[3]).floatValue());
-			
+
 			avaliacao.setMatricula(matricula);
 			avaliacao.setPesoAvaliacao(pesoAvaliacao);
-			
+
 			avaliacoes.add(avaliacao);
 		}
 		return avaliacoes;
@@ -276,73 +250,33 @@ public class NotasController {
 	}
 
 	private List<Avaliacao> buscaNotasComParam(Aluno aluno, Disciplina disciplina) {
-		boolean status = false;
 		List<Object[]> objetos = new ArrayList<>();
 		List<Avaliacao> avaliacoes = new ArrayList<>();
-		objetos = nRep.buscaNotasComParam(aluno.getCpf(), disciplina.getCodDisciplina(), 
-										  Integer.parseInt(anoSemestre()));
-		if (objetos.isEmpty()) {
-			List<PesoAvaliacao> tiposAvaliacao = new ArrayList<>();
+		objetos = nRep.buscaNotasComParam(aluno.getCpf(), disciplina.getCodDisciplina(),
+				Integer.parseInt(anoSemestre()));
 
-			tiposAvaliacao = buscaPesoAvaliacao(disciplina);
-
-			int tamanho = tiposAvaliacao.size();
-
-			for (int i = 0; i < tamanho; i++) {
-
-				nRep.cadastraNotasDefault(0.0f, aluno.getCpf(), Integer.parseInt(anoSemestre()),
-						disciplina.getCodDisciplina(), tiposAvaliacao.get(i).getCodigo());
-				;
-			}
-			
-			status = true;
-		} 
-
-		if(!objetos.isEmpty() || status == true) {
-			objetos = new ArrayList<>();
-			objetos = nRep.buscaNotasComParam(aluno.getCpf(), disciplina.getCodDisciplina(),
-											  Integer.parseInt(anoSemestre()));
-			
-			for (Object[] row : objetos) {
-				Avaliacao avaliacao = new Avaliacao();
-				PesoAvaliacao pesoAvaliacao = new PesoAvaliacao();
-				Matricula matricula = new Matricula();
-				aluno = new Aluno();
-				
-				aluno.setNome((String) row[0].toString());
-				aluno.setCpf((String) row[1].toString());
-				matricula.setAluno(aluno);
-				
-				pesoAvaliacao.setTipo((String) row[2].toString());
-				avaliacao.setNota(((Number) row[3]).floatValue());
-				
-				avaliacao.setMatricula(matricula);
-				avaliacao.setPesoAvaliacao(pesoAvaliacao);
-				
-				avaliacoes.add(avaliacao);
-			}
-		}
-
-		return avaliacoes;
-	}
-
-	private List<PesoAvaliacao> buscaPesoAvaliacao(Disciplina disciplina) {
-		List<Object[]> objetos = new ArrayList<>();
-		List<PesoAvaliacao> avaliacoes = new ArrayList<>();
-		objetos = nRep.buscaPesoAvaliacao(disciplina.getCodDisciplina());
 		for (Object[] row : objetos) {
+			Avaliacao avaliacao = new Avaliacao();
 			PesoAvaliacao pesoAvaliacao = new PesoAvaliacao();
-			disciplina = new Disciplina();
-			pesoAvaliacao.setCodigo((Integer) row[0]);
-			pesoAvaliacao.setPeso((double) row[1]);
-			pesoAvaliacao.setTipo((String) row[2].toString());
-			disciplina.setCodDisciplina((Integer) row[3]);
-			pesoAvaliacao.setDisciplina(disciplina);
+			Matricula matricula = new Matricula();
+			aluno = new Aluno();
 
-			avaliacoes.add(pesoAvaliacao);
+			aluno.setNome((String) row[0].toString());
+			aluno.setCpf((String) row[1].toString());
+			matricula.setAluno(aluno);
+
+			pesoAvaliacao.setTipo((String) row[2].toString());
+			avaliacao.setNota(((Number) row[3]).floatValue());
+
+			avaliacao.setMatricula(matricula);
+			avaliacao.setPesoAvaliacao(pesoAvaliacao);
+
+			avaliacoes.add(avaliacao);
 		}
+
 		return avaliacoes;
 	}
+
 
 	private String anoSemestre() {
 

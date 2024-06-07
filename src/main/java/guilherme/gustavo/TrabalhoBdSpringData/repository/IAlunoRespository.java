@@ -41,4 +41,20 @@ public interface IAlunoRespository extends JpaRepository<Aluno, String>{
 				FROM Aluno a
 			""", nativeQuery = true)
 	List<Object[]> listarAlunos();
+	
+	@Query(value = """
+            select d.nome, pav.tipo ,av.nota 
+           from Aluno a, Avaliacao av, PesoAvaliacao pav, Matricula m, Disciplina d
+           where av.cpf = a.cpf
+                 and a.cpf = m.cpf
+                 and av.codigoPesoAvaliacao = pav.codigo
+                 and av.anoSemestre = m.anoSemestre
+                 and m.codDisciplina = d.codDisciplina
+                 and av.cpf = :cpf
+                 and m.statusMatricula = 'pendente'
+                 and av.codDisciplina = m.codDisciplina
+                 and av.anoSemestre = 20241
+                 order by pav.tipo asc
+       """, nativeQuery = true)
+   List<Object[]> buscaAvaliacoes(@Param("cpf") String cpf);
 }

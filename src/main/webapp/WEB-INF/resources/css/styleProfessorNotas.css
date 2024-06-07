@@ -67,7 +67,7 @@ form {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    margin-top:30px;
+    margin-top:0px;
 }
 
 .formulario {
@@ -89,7 +89,7 @@ form {
 
 .baixo {
 	width: 100%;
-	 display: flex;
+	display: flex;
     justify-content: center;
     flex-direction: column;
     align-items: center;
@@ -199,9 +199,12 @@ th {
 }
 
 table form {
-    width: 200px;
+    width: 135px;
 }
 
 table input[type = "submit"] {
     width: 130px;
+    margin: 0px;
+  	margin-left: 120px;
 }
+
