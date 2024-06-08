@@ -49,7 +49,7 @@ public class AlunoListarController {
 				}
 			}
 
-		} catch (SQLException | ClassNotFoundException e) {
+		} catch (Exception e) {
 			erro = e.getMessage();
 		} finally {
 			model.addAttribute("saida", saida);
@@ -60,7 +60,7 @@ public class AlunoListarController {
 		return new ModelAndView("alunoListar");
 	}
 
-	private List<Aluno> listarAlunos() throws SQLException, ClassNotFoundException {
+	private List<Aluno> listarAlunos() throws Exception {
 		List<Aluno> alunos = new ArrayList<>();
 		alunos = aRep.findAll();
 		return alunos;

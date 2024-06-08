@@ -62,7 +62,7 @@ public class SolicitarDispensaController {
 					erro = "CPF nao cadastrado";
 				}
 
-			} catch (SQLException | ClassNotFoundException e) {
+			} catch (Exception e) {
 				erro = e.getMessage();
 			} finally {
 				model.addAttribute("saida", saida);
@@ -128,8 +128,8 @@ public class SolicitarDispensaController {
 			} else {
 				erro = "Tamanho de CPF invalido";
 			}
-		} catch (SQLException | ClassNotFoundException e) {
-			erro = e.getMessage();
+		} catch (Exception e) {
+			erro = trataErro(e.getMessage());
 		} finally {
 			model.addAttribute("saida", saida);
 			model.addAttribute("erro", erro);
@@ -140,7 +140,7 @@ public class SolicitarDispensaController {
 		return new ModelAndView("solicitarDispensa");
 	}
 
-	private List<Dispensa> listarDispensas(String cpf) throws SQLException, ClassNotFoundException {
+	private List<Dispensa> listarDispensas(String cpf) throws Exception {
 		List<Dispensa> dispensas = new ArrayList<>();
 		List<Object[]> objetos = new ArrayList<>();
 		objetos = dRep.listarDispensasComParam(cpf);
@@ -160,17 +160,17 @@ public class SolicitarDispensaController {
 		return dispensas;
 	}
 
-	private String cadastrarDispensa(Dispensa dispensa) throws SQLException, ClassNotFoundException {
+	private String cadastrarDispensa(Dispensa dispensa) throws Exception {
 		return dRep.sp_iDispensa(dispensa.getAluno().getCpf(), dispensa.getDisciplina().getCodDisciplina(), 
 				dispensa.getInstituicao());
 	}
 
-	private int buscaAluno(Aluno aluno) throws SQLException, ClassNotFoundException {
+	private int buscaAluno(Aluno aluno) throws Exception {
 		int saida = dRep.sp_validaCpfDuplicado(aluno.getCpf());
 		return saida;
 	}
 
-	private List<Disciplina> popularDisciplinas(Aluno aluno) throws SQLException, ClassNotFoundException {
+	private List<Disciplina> popularDisciplinas(Aluno aluno) throws Exception {
 		List<Disciplina> disciplinas = new ArrayList<>();
 		List<Object[]> objetos = new ArrayList<>();
 		objetos = dRep.popularDisciplinas(aluno.getCpf());
@@ -185,6 +185,22 @@ public class SolicitarDispensaController {
 		}
 		
 		return disciplinas;
+	}
+	
+	private String trataErro(String erro) {
+		if (erro.contains("Cpf nao esta cadastrado")){
+			return "Cpf nao esta cadastrado";
+		}
+		if (erro.contains("CPF inexistente")){
+			return "CPF inexistente";
+		}
+		if (erro.contains("CPF invalido, todos os digitos sao iguais")){
+			return "CPF invalido, todos os digitos sao iguais";
+		}
+		if (erro.contains("CPF invalido, numero de caracteres incorreto")){
+			return "CPF invalido, numero de caracteres incorreto";
+		}
+		return erro;
 	}
 
 }

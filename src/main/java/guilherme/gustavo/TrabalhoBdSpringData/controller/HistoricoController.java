@@ -71,7 +71,7 @@ public class HistoricoController {
 				erro = "Tamanho de Ra invalido";
 				matricula = new Matricula();
 			}
-		} catch (SQLException | ClassNotFoundException e) {
+		} catch (Exception e) {
 			erro = e.getMessage();
 		} finally {
 			model.addAttribute("saida", saida);
@@ -83,12 +83,12 @@ public class HistoricoController {
 		return new ModelAndView("historico");
 	}
 
-	private int verificaRa(Aluno aluno) throws SQLException, ClassNotFoundException {
+	private int verificaRa(Aluno aluno) throws Exception {
 		int saida = mRep.sp_validaRa(aluno.getRa());
 		return saida;
 	}
 
-	private Matricula populaInfosAluno(Matricula matricula) throws SQLException, ClassNotFoundException {
+	private Matricula populaInfosAluno(Matricula matricula) throws Exception {
 		Matricula m = new Matricula();
 		List<Object[]> objetos = mRep.populaInfosMatricula(matricula.getAluno().getRa());
 		Aluno a = new Aluno();
@@ -109,7 +109,7 @@ public class HistoricoController {
 		return m;
 	}
 
-	private List<Matricula> populaHistorico(Aluno aluno) throws SQLException, ClassNotFoundException {
+	private List<Matricula> populaHistorico(Aluno aluno) throws Exception {
 		List<Matricula> matriculas = new ArrayList<>();
 		List<Object[]> objetos = mRep.populaHistorico(aluno.getRa());
 

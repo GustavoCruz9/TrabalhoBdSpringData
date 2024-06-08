@@ -125,16 +125,18 @@ public class AlunoCadastrarController {
 					if (cmd.contains("Buscar")) {
 						if (verificaCpf(a) == 1) {
 							a = buscarAluno(a);
+							if(a == null) {
+								erro = "CPF Inexistente";
+							}
 						}
 					}
-
 				} else {
 					erro = "Tamanho de CPF invalido";
 				}
 			}
 
-		} catch (SQLException | ClassNotFoundException e) {
-			erro = e.getMessage();
+		} catch (Exception e) {
+			erro = trataErro(e.getMessage());
 			if (erro.contains("verificaDataConclusao")) {
 				erro = "A data de conclusao deve ser maior que a data de nascimento";
 			}
@@ -148,8 +150,8 @@ public class AlunoCadastrarController {
 
 		return new ModelAndView("alunoCadastrar");
 	}
-	
-	private String cadastrarAluno(Aluno aluno) throws SQLException, ClassNotFoundException {
+
+	private String cadastrarAluno(Aluno aluno) throws Exception {
 		String saida = aRep.sp_iuAluno(
 	            "I",
 	            aluno.getCpf(),
@@ -170,7 +172,7 @@ public class AlunoCadastrarController {
 		return saida;
 	}
 
-	private String atualizarAluno(Aluno aluno) throws SQLException, ClassNotFoundException {
+	private String atualizarAluno(Aluno aluno) throws Exception {
 		String saida = aRep.sp_iuAluno(
 	            "U",
 	            aluno.getCpf(),
@@ -190,15 +192,36 @@ public class AlunoCadastrarController {
 		return saida;
 	}
 
-	private Aluno buscarAluno(Aluno a) throws SQLException, ClassNotFoundException {
-		a = aRep.findById(a.getCpf()).orElse(new Aluno());
+	private Aluno buscarAluno(Aluno a) throws Exception {
+		a = aRep.findById(a.getCpf()).orElse(null);
 		return a;
 	}
 
-	private int verificaCpf(Aluno a) throws SQLException, ClassNotFoundException {
+	private int verificaCpf(Aluno a) throws Exception{
 		return aRep.sp_consultaCpf(a.getCpf());
 	}
 
+	private String trataErro(String erro) {
+		if (erro.contains("CPF ja cadastrado")){
+			return "CPF ja cadastrado";
+		}
+		if (erro.contains("O codigo do curso e invalido")){
+			return "O codigo do curso e invalido";
+		}
+		if (erro.contains("A idade e menor que 16 anos")){
+			return "A idade e menor que 16 anos";
+		}
+		if (erro.contains("CPF inexistente")){
+			return "CPF inexistente";
+		}
+		if (erro.contains("CPF invalido, todos os digitos sao iguais")){
+			return "CPF invalido, todos os digitos sao iguais";
+		}
+		if (erro.contains("CPF invalido, numero de caracteres incorreto")){
+			return "CPF invalido, numero de caracteres incorreto";
+		}
+		return erro;
+	}
 	
 }
 

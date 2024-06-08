@@ -149,7 +149,7 @@ public class EditarChamadaController {
 				
 				saida = "Chamada atualizada com sucesso";
 			}
-		} catch (SQLException | ClassNotFoundException e) {
+		} catch (Exception e) {
 			erro = e.getMessage();
 		} finally {
 			model.addAttribute("saida", saida);
@@ -183,7 +183,7 @@ public class EditarChamadaController {
 		}
 	}
 
-	private List<ListaChamada> buscarAlunos(Disciplina d, String dataChamada) throws SQLException, ClassNotFoundException{
+	private List<ListaChamada> buscarAlunos(Disciplina d, String dataChamada) throws Exception{
 		List<ListaChamada> chamadas = new ArrayList<>();
 		List<Object[]> objetos = new ArrayList<>();
 		objetos = lRep.buscarAlunosEditarChamada(d.getCodDisciplina(), dataChamada);
@@ -219,7 +219,7 @@ public class EditarChamadaController {
 		return chamadas;
 	}
 
-	private void editarChamada(ListaChamada lc) throws SQLException, ClassNotFoundException{
+	private void editarChamada(ListaChamada lc) throws Exception{
 		lRep.atualizaChamada(lc.getPresenca(), lc.getAusencia(), lc.getAula1(), lc.getAula2(), lc.getAula3(), 
 				lc.getAula4(), lc.getMatricula().getDisciplina().getCodDisciplina(), lc.getMatricula().getAluno().getCpf(),
 				lc.getDataChamada());

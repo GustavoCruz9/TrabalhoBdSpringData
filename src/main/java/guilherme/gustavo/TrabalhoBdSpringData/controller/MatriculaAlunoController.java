@@ -50,7 +50,7 @@ public class MatriculaAlunoController {
 					erro = "Tamanho de RA incorreto";
 				}
 
-			} catch (SQLException | ClassNotFoundException e) {
+			} catch (Exception e) {
 				erro = e.getMessage();
 			} finally {
 				model.addAttribute("saida", saida);
@@ -91,12 +91,12 @@ public class MatriculaAlunoController {
 		try {
 			saida = cadastrarMatricula(m);
 			disciplinas = listarDisciplinas(a);
-		} catch (SQLException | ClassNotFoundException e) {
+		} catch (Exception e) {
 			erro = e.getMessage();
 
 			try {
 				disciplinas = listarDisciplinas(a);
-			} catch (SQLException | ClassNotFoundException e1) {
+			} catch (Exception e1) {
 				erro = e1.getMessage();
 			}
 
@@ -109,15 +109,15 @@ public class MatriculaAlunoController {
 		return new ModelAndView("matriculaAluno");
 	}
 
-	private int verificaRa(Aluno a) throws SQLException, ClassNotFoundException {
+	private int verificaRa(Aluno a) throws Exception {
 		return mRep.sp_validaRa(a.getRa());
 	}
 
-	private String cadastrarMatricula(Matricula m) throws SQLException, ClassNotFoundException {
+	private String cadastrarMatricula(Matricula m) throws Exception {
 		return mRep.cadastrarMatricula(m.getAluno().getRa(), m.getDisciplina().getCodDisciplina());
 	}
 
-	private List<Matricula> listarDisciplinas(Aluno a) throws SQLException, ClassNotFoundException {
+	private List<Matricula> listarDisciplinas(Aluno a) throws Exception {
 		List<Matricula> disciplinas = new ArrayList<>();
 		List<Object[]> objetos = mRep.listarDisciplinas(a.getRa());
 

@@ -40,8 +40,8 @@ public class ConfirmarDispensasController {
 				if (dispensas.isEmpty()) {
 					erro = "Nao existe solicitacoes de dispensa no momento";
 				}
-			} catch (SQLException | ClassNotFoundException e) {
-				erro = e.getMessage();
+			} catch (Exception e) {
+				erro = trataErro(e.getMessage());
 			} finally {
 				model.addAttribute("saida", saida);
 				model.addAttribute("erro", erro);
@@ -78,8 +78,8 @@ public class ConfirmarDispensasController {
 				if(dispensas.isEmpty()) {
 					erro = "Nao existe solicitacoes de dispensa no momento";
 				}
-			} catch (SQLException | ClassNotFoundException e) {
-				erro = e.getMessage();
+			} catch (Exception e) {
+				erro = trataErro(e.getMessage());
 			} finally {
 				model.addAttribute("erro", erro);
 				model.addAttribute("dispensas", dispensas);
@@ -142,8 +142,8 @@ public class ConfirmarDispensasController {
 				}
 			}
 
-		} catch (SQLException | ClassNotFoundException e) {
-			erro = e.getMessage();
+		} catch (Exception e) {
+			erro = trataErro(e.getMessage());
 		} finally {
 			model.addAttribute("saida", saida);
 			model.addAttribute("erro", erro);
@@ -154,15 +154,15 @@ public class ConfirmarDispensasController {
 		return new ModelAndView("confirmarDispensa");
 	}
 
-	private int verificaCpfSeExiste(Aluno a) throws ClassNotFoundException, SQLException {
+	private int verificaCpfSeExiste(Aluno a) throws Exception {
 		return dRep.sp_validaCpfDuplicado(a.getCpf());
 	}
 	
-	private int verificaCpf(Aluno a) throws ClassNotFoundException, SQLException {
+	private int verificaCpf(Aluno a) throws Exception {
 		return dRep.sp_consultaCpf(a.getCpf());
 	}
 
-	private List<Dispensa> listarDispensasComCpf(Aluno a) throws ClassNotFoundException, SQLException {
+	private List<Dispensa> listarDispensasComCpf(Aluno a) throws Exception {
 		List<Dispensa> dispensas = new ArrayList<>();
 		List<Object[]> objetos = dRep.listarDispensasComCpf(a.getCpf());
 		
@@ -187,12 +187,12 @@ public class ConfirmarDispensasController {
 		return dispensas;
 	}
 
-	private String cofirmarDispensa(Dispensa disp) throws ClassNotFoundException, SQLException {
+	private String cofirmarDispensa(Dispensa disp) throws Exception {
 		String saida = dRep.sp_atualizaDispensa(disp.getAluno().getRa(), disp.getDisciplina().getCodDisciplina(), disp.getStatusDispensa());
 		return saida;
 	}
 
-	private List<Dispensa> listarDispensas() throws SQLException, ClassNotFoundException {
+	private List<Dispensa> listarDispensas() throws Exception {
 		List<Dispensa> dispensas = new ArrayList<>();
 		List<Object[]> objetos = dRep.listarDispensas();
 		
@@ -215,6 +215,19 @@ public class ConfirmarDispensasController {
 		}
 		
 		return dispensas;
+	}
+	
+	private String trataErro(String erro) {
+		if (erro.contains("CPF inexistente")){
+			return "CPF inexistente";
+		}
+		if (erro.contains("CPF invalido, todos os digitos sao iguais")){
+			return "CPF invalido, todos os digitos sao iguais";
+		}
+		if (erro.contains("CPF invalido, numero de caracteres incorreto")){
+			return "CPF invalido, numero de caracteres incorreto";
+		}
+		return erro;
 	}
 
 }

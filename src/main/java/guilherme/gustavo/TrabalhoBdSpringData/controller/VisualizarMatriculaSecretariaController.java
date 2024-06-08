@@ -77,7 +77,7 @@ public class VisualizarMatriculaSecretariaController {
 
 			}
 
-		} catch (SQLException | ClassNotFoundException e) {
+		} catch (Exception e) {
 			erro = e.getMessage();
 
 		} finally {
@@ -90,11 +90,11 @@ public class VisualizarMatriculaSecretariaController {
 
 	}
 
-	private int verificaRa(Aluno a) throws SQLException, ClassNotFoundException {
+	private int verificaRa(Aluno a) throws Exception {
 		return mRep.sp_validaRa(a.getRa());
 	}
 
-	private List<Matricula> listarMatriculas(Aluno a) throws SQLException, ClassNotFoundException {
+	private List<Matricula> listarMatriculas(Aluno a) throws Exception {
 		List<Matricula> matriculas = new ArrayList<>();
 		List<Object[]> objetos = mRep.listarMatriculas(a.getRa());
 		

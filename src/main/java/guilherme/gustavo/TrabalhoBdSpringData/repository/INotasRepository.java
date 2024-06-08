@@ -62,6 +62,32 @@ public interface INotasRepository extends JpaRepository<Avaliacao, Integer> {
 			""", nativeQuery = true)
 	List<Object[]> buscaCodigosAvaliacoes(@Param("codDisciplina") int codDisciplina, @Param("cpf") String cpf);
 	
+	@Query(value = """
+            select d.nome, 
+			    string_agg(
+			        concat(pav.tipo, ' ', NULL), 
+			        '; '
+			    ) within group (order by pav.tipo) as tipoavaliacoes,
+				string_agg(
+			        concat(av.nota, ' ', NULL), 
+			        '; '
+			    ) within group (order by pav.tipo) as avaliacoes, 
+			    isnull(max(m.nota), -1) as nota
+			from Aluno a, Avaliacao av, PesoAvaliacao pav, Matricula m, Disciplina d
+			where av.cpf = a.cpf
+					and a.cpf = m.cpf
+					and av.codigoPesoAvaliacao = pav.codigo
+					and av.anoSemestre = m.anoSemestre
+					and m.codDisciplina = d.codDisciplina
+					and av.cpf = :cpf
+					and m.statusMatricula = 'pendente'
+					and av.codDisciplina = m.codDisciplina
+					and av.anoSemestre = 20241
+			group by d.nome
+			order by d.nome
+       """, nativeQuery = true)
+   List<Object> buscaAvaliacoes(@Param("cpf") String cpf);
+	
 	@Modifying
     @Transactional
 	@Query(value = """

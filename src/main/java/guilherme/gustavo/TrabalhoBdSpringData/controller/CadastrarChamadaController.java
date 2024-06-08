@@ -149,7 +149,7 @@ public class CadastrarChamadaController {
 				
 				saida = "Chamada cadastrada com sucesso";
 			}
-		} catch (SQLException | ClassNotFoundException e) {
+		} catch (Exception e) {
 			erro = e.getMessage();
 		} finally {
 			model.addAttribute("saida", saida);
@@ -162,14 +162,14 @@ public class CadastrarChamadaController {
 		return new ModelAndView("cadastrarChamada");
 	}
 
-	private void cadastraChamada(ListaChamada listaChamada) throws SQLException, ClassNotFoundException {
+	private void cadastraChamada(ListaChamada listaChamada) throws Exception {
 		lRep.cadastrarChamada(listaChamada.getDataChamada(), listaChamada.getMatricula().getAnoSemestre(),
 				listaChamada.getMatricula().getAluno().getCpf(), listaChamada.getMatricula().getDisciplina().getCodDisciplina(),
 				listaChamada.getPresenca(), listaChamada.getAusencia(), listaChamada.getAula1(), listaChamada.getAula2(),
 				listaChamada.getAula3(), listaChamada.getAula4()); 
 	}
 
-	private List<Matricula> buscarAlunos(Disciplina d) throws SQLException, ClassNotFoundException {
+	private List<Matricula> buscarAlunos(Disciplina d) throws Exception {
 		
 		List<Object[]> objetos = new ArrayList<>();
 		List<Matricula> matriculas = new ArrayList<>();

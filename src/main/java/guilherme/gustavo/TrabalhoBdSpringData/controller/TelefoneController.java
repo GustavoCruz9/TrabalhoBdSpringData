@@ -96,8 +96,8 @@ public class TelefoneController {
 					erro = "Nao existe nenhum telefone cadastrado para este Aluno";
 				}
 			}
-		} catch (SQLException | ClassNotFoundException e) {
-			erro = e.getMessage();
+		} catch (Exception e) {
+			erro = trataErro(e.getMessage());
 		} finally {
 			model.addAttribute("saida", saida);
 			model.addAttribute("erro", erro);
@@ -125,12 +125,12 @@ public class TelefoneController {
 		return telefones;
 	}
 
-	private String cadastrarTelefone(Telefone telefone) throws SQLException, ClassNotFoundException {
+	private String cadastrarTelefone(Telefone telefone) throws Exception {
 		String saida = tRep.sp_iudTelefone("I", telefone.getAluno().getCpf(), null, telefone.getNumero());
 		return saida;
 	}
 
-	private String atualizarTelefone(Telefone telefone, Telefone telefoneAntigo) throws SQLException, ClassNotFoundException {
+	private String atualizarTelefone(Telefone telefone, Telefone telefoneAntigo) throws Exception {
 		String saida = tRep.sp_iudTelefone("U", telefone.getAluno().getCpf(), telefoneAntigo.getNumero(), telefone.getNumero());
 		return saida;
 	}
@@ -155,6 +155,34 @@ public class TelefoneController {
 			telefones.add(t);
 		} 
 		return telefones;
+	}
+	
+	private String trataErro(String erro) {
+		if (erro.contains("Cpf nao esta cadastrado")){
+			return "Cpf nao esta cadastrado";
+		}
+		if (erro.contains("CPF inexistente")){
+			return "CPF inexistente";
+		}
+		if (erro.contains("CPF invalido, todos os digitos sao iguais")){
+			return "CPF invalido, todos os digitos sao iguais";
+		}
+		if (erro.contains("CPF invalido, numero de caracteres incorreto")){
+			return "CPF invalido, numero de caracteres incorreto";
+		}
+		if (erro.contains("O telefone nao existe no banco de dados")){
+			return "O telefone nao existe no banco de dados";
+		}
+		if (erro.contains("Tamanho de telefone incorreto")){
+			return "Tamanho de telefone incorreto";
+		}
+		if (erro.contains("O telefone ja existe no banco de dados")){
+			return "O telefone ja existe no banco de dados";
+		}
+		if (erro.contains("O CPF nao existe na base de dados do sistema")){
+			return "O CPF nao existe na base de dados do sistema";
+		}
+		return erro;
 	}
 
 }

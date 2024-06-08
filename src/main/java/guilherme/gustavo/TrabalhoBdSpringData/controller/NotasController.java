@@ -158,8 +158,8 @@ public class NotasController {
 				qtdNotas = nRep.buscaQtdPesos(disciplina.getCodDisciplina());
 			}
 
-		} catch (SQLException | ClassNotFoundException e1) {
-			erro = e1.getMessage();
+		} catch (Exception e1) {
+			erro = trataErro(e1.getMessage());
 		} finally {
 			model.addAttribute("erro", erro);
 			model.addAttribute("saida", saida);
@@ -242,7 +242,7 @@ public class NotasController {
 		return avaliacoes;
 	}
 
-	private String cadastrarAvaliacoes(List<Avaliacao> avaliacoes) throws SQLException, ClassNotFoundException {
+	private String cadastrarAvaliacoes(List<Avaliacao> avaliacoes) throws Exception {
 		for (Avaliacao a : avaliacoes) {
 			nRep.cadastraNotas(a.getNota(), a.getCodigo());
 		}
@@ -289,7 +289,7 @@ public class NotasController {
 
 	}
 
-	private List<Disciplina> buscaDisciplina(Professor p) throws ClassNotFoundException, SQLException {
+	private List<Disciplina> buscaDisciplina(Professor p) throws Exception {
 
 		List<Disciplina> disciplinas = new ArrayList<>();
 		List<Object[]> objetos = new ArrayList<>();
@@ -305,8 +305,18 @@ public class NotasController {
 		return disciplinas;
 	}
 
-	private int validaProfessor(Professor p) throws SQLException, ClassNotFoundException {
+	private int validaProfessor(Professor p) throws Exception {
 		return lRep.validaProfessor(p.getCodProfessor());
+	}
+	
+	private String trataErro(String erro) {
+		if (erro.contains("Professor nao leciona nenhuma disciplina")){
+			return "Professor nao leciona nenhuma disciplina";
+		}
+		if (erro.contains("O codigo de professor nao existe")){
+			return "O codigo de professor nao existe";
+		}
+		return erro;
 	}
 
 }

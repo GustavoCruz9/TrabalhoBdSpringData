@@ -79,7 +79,7 @@ public class ChamadaController {
 					if (validaProfessor(p) == 1) {
 						disciplinas = buscaDisciplina(p);
 					}
-				} catch (SQLException | ClassNotFoundException e1) {
+				} catch (Exception e1) {
 					erro = e1.getMessage();	
 				} finally {
 					model.addAttribute("erro", erro);
@@ -103,8 +103,8 @@ public class ChamadaController {
 						return new ModelAndView("cadastrarChamada");
 					}
 				}
-			} catch (SQLException | ClassNotFoundException e) {
-				erro = e.getMessage();
+			} catch (Exception e) {
+				erro = trataErro(e.getMessage());
 			}
 
 		}
@@ -131,8 +131,8 @@ public class ChamadaController {
 					disciplinas = buscaDisciplina(p);
 				}
 			}
-		} catch (SQLException | ClassNotFoundException e) {
-			erro = e.getMessage();
+		} catch (Exception e) {
+			erro = trataErro(e.getMessage());
 		} finally {
 			model.addAttribute("saida", saida);
 			model.addAttribute("erro", erro);
@@ -144,7 +144,7 @@ public class ChamadaController {
 		return new ModelAndView("chamada");
 	}
 
-	private List<ListaChamada> buscaChamada(Disciplina d) throws ClassNotFoundException, SQLException {
+	private List<ListaChamada> buscaChamada(Disciplina d) throws Exception {
 
 		List<ListaChamada> chamadas = new ArrayList<>();
 		List<Object[]> objetos = new ArrayList<>();
@@ -171,7 +171,7 @@ public class ChamadaController {
 		return chamadas;
 	}
 
-	private List<Disciplina> buscaDisciplina(Professor p) throws ClassNotFoundException, SQLException {
+	private List<Disciplina> buscaDisciplina(Professor p) throws Exception {
 		
 		List<Disciplina> disciplinas = new ArrayList<>();
 		List<Object[]> objetos = new ArrayList<>();
@@ -187,8 +187,18 @@ public class ChamadaController {
 		return disciplinas;
 	}
 
-	private int validaProfessor(Professor p) throws SQLException, ClassNotFoundException {
+	private int validaProfessor(Professor p) throws Exception {
 		return lRep.validaProfessor(p.getCodProfessor());
 	}
 
+	private String trataErro(String erro) {
+		if (erro.contains("Professor nao leciona nenhuma disciplina")){
+			return "Professor nao leciona nenhuma disciplina";
+		}
+		if (erro.contains("O codigo de professor nao existe")){
+			return "O codigo de professor nao existe";
+		}
+		return erro;
+	}
+	
 }
