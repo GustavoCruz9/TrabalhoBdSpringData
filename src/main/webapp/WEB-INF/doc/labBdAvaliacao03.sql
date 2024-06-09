@@ -417,14 +417,14 @@ begin
 			while(@tamanhoPeso > 0)
 			begin
 
-			set @codPesoAvaliacao =  (select top 1 cod from #pesos)
+				set @codPesoAvaliacao =  (select top 1 cod from #pesos)
 
-			insert into Avaliacao values 
-			(0, @cpf, @anoSemestre, @codDisciplina, @codPesoAvaliacao)
+				insert into Avaliacao (nota, cpf, anoSemestre, codDisciplina, codigoPesoAvaliacao) values 
+				(0, @cpf, @anoSemestre, @codDisciplina, @codPesoAvaliacao)
 
-			delete top (1) from #pesos
+				delete top (1) from #pesos
 
-			set @tamanhoPeso = @tamanhoPeso - 1
+				set @tamanhoPeso = @tamanhoPeso - 1
 
 			end
 
@@ -924,6 +924,360 @@ as
 				FROM Aluno a
 go
 
+-- Procedure que verifica status de frequencia e notas
+-- drop procedure sp_finalizaSemestre
+create procedure sp_finalizaSemestre (@codDisciplina int, @anoSemestre int, @saida varchar(100) output)
+as			
+	declare @cpf char(11),	
+			@qtdPesosAvaliacao int,
+			@media decimal(4, 2),
+			@statusAluno varchar(20),
+			@qtdAlunos int,
+			@nota float,
+			@qtdAulasPorSemana int,
+			@qtdChamadas int,
+			@horasSemanais varchar(10),
+			@horas int,
+			@minutos int,
+			@totalHoras int,
+			@qtdPresencasPossiveis int,
+			@qtdPresencasAluno int,
+			@frequencia decimal(5,2)
+
+	-- Pega a quantidade de chamadas realizadas
+
+	set @qtdChamadas = (select count(distinct dataChamada) as numeroDeAulas from ListaChamada where codDisciplina = @codDisciplina)
+
+	-- Pega a Quantidade de presenças possiveis por semana
+	
+	set @horasSemanais = (select horasSemanais from Disciplina where codDisciplina = @codDisciplina)
+	set @horas = (cast(substring(@horasSemanais, 1, charindex(':', @horasSemanais) - 1) as int) * 60 )
+	set @minutos = cast(substring(@horasSemanais, charindex(':',@horasSemanais ) + 1, len(@horasSemanais)) as int)
+	set @totalHoras = @horas + @minutos
+
+	set @qtdAulasPorSemana = (@totalHoras / 50)
+
+	-- Calcula a Quantidade de presenças possiveis no semestre
+
+	set @qtdPresencasPossiveis = (@qtdChamadas * @qtdAulasPorSemana)
+
+	create table #notas(
+		nota float
+	)
+
+	create table #alunos(
+		cpf char(11)
+	)
+
+	insert into #alunos (cpf)
+				select cpf from Matricula where codDisciplina = @codDisciplina and anoSemestre = @anoSemestre and statusMatricula = 'pendente'
+
+	set @qtdAlunos = (select count(cpf) as qtdAlunos from Matricula where anoSemestre = @anoSemestre and codDisciplina = @codDisciplina and statusMatricula = 'pendente')
+
+
+	while(@qtdAlunos > 0)
+	begin
+
+		set @qtdPresencasAluno = 0
+		set @media = 0
+		set @frequencia = 0
+		
+		set @cpf = (select top 1 cpf from #alunos)
+
+		-- Pega a Quantidade de presenças do aluno
+
+		set @qtdPresencasAluno = (select sum(presenca) as qtdPresencasAluno
+								  from ListaChamada 
+								  where cpf = @cpf 
+								  and anoSemestre = @anoSemestre 
+								  and codDisciplina = @codDisciplina) 
+
+		--Regra de 3 para descobrir a frequencia
+
+		set @qtdPresencasAluno = (@qtdPresencasAluno * 100)
+
+		set @frequencia = (@qtdPresencasAluno/@qtdPresencasPossiveis)
+
+		insert into #notas (nota)
+					select a.nota 
+					from Avaliacao a, PesoAvaliacao pav 
+					where a.codigoPesoAvaliacao = pav.codigo 
+						 and a.cpf = @cpf
+						 and a.anoSemestre = @anoSemestre
+						 and a.codDisciplina = @codDisciplina
+					order by pav.tipo asc
+
+			declare @peso float
+	
+			DECLARE c CURSOR FOR 
+				select peso from PesoAvaliacao where codDisciplina = @codDisciplina order by tipo asc 
+			OPEN c
+			FETCH NEXT FROM c 
+				INTO @peso
+			WHILE @@FETCH_STATUS = 0
+			BEGIN
+			
+				set @nota = (select top 1 nota from #notas)
+
+
+				set @media = (@media + (@nota * @peso))
+			
+				delete top (1) from #notas
+ 
+				FETCH NEXT FROM c INTO @peso
+			END
+			CLOSE c
+			DEALLOCATE c		
+	
+		-- Verifica Status de Aprovacao na disciplina
+		
+		
+
+		if(@frequencia < 75 or @media < 3)
+		begin
+			set @statusAluno = 'Reprovado'
+		end
+		else
+		begin
+			if(@frequencia >= 75 and @media >= 6)
+			begin
+				set @statusAluno = 'Aprovado'
+			end
+			else
+			begin
+				set @statusAluno = 'Exame'
+			end
+		end
+
+		--Atualiza media e status do aluno na tabela matricula
+
+		update Matricula 
+		set nota = @media, statusMatricula = @statusAluno
+		where cpf = @cpf
+			  and anoSemestre = @anoSemestre
+			  and codDisciplina = @codDisciplina
+
+		delete top(1) from #alunos
+
+		set @qtdAlunos = @qtdAlunos - 1
+	end
+
+		set @saida = 'Disciplina finalizada com sucesso' 
+
+go
+
+-- trigger que verifica status de frequencia e notas
+--   trigger t_calculaMedia_Avaliacao on avaliacao
+-- drop trigger t_calculaMedia_Avaliacao
+create trigger t_calculaMedia_Avaliacao on Avaliacao
+after update
+as 
+begin
+		
+	declare @codDisciplina int,
+			@cpf char(11),
+			@anoSemestre int,
+			@nota float,
+			@peso float
+
+
+	set @codDisciplina = (select codDisciplina from deleted)
+	set @cpf = (select cpf from deleted)
+	set @anoSemestre = (select anoSemestre from deleted)
+
+	--CALCULA MEDIA ATUAL--CALCULA MEDIA ATUAL--CALCULA MEDIA ATUAL--CALCULA MEDIA ATUAL
+
+	declare @qtdPesosAvaliacao int,
+			@media decimal(4, 2),
+			@statusAluno varchar(20)
+
+		set @media = 0
+		set @nota = 0 
+		set @peso = 0
+
+	-- Pega a Quantidade de pesos da disciplina
+
+	set @qtdPesosAvaliacao = (select count(codigo) as qtdPesosAvaliacao from PesoAvaliacao where codDisciplina = @codDisciplina)
+
+
+	create table #pesos(
+		peso float
+	)
+
+	create table #notas(
+		nota float
+	)
+
+	-- Insere pesos e notas de forma ordenada nas tabelas temporarias
+
+	insert into #pesos (peso)
+		   select peso from PesoAvaliacao where codDisciplina = @codDisciplina order by tipo asc 
+
+	insert into #notas (nota)
+			select a.nota 
+			from Avaliacao a, PesoAvaliacao pav 
+			where a.codigoPesoAvaliacao = pav.codigo 
+				 and a.cpf = @cpf
+				 and a.anoSemestre = @anoSemestre
+				 and a.codDisciplina = @codDisciplina
+				  order by pav.tipo asc 
+
+	-- Calcula media da matricula do aluno
+
+	while(@qtdPesosAvaliacao > 0)
+	begin
+		set @nota = (select top 1 nota from #notas) 
+		set @peso = (select top 1 peso from #pesos)
+
+		if(@nota is not null)
+		begin
+			set @media = (@media + (@nota * @peso))
+		end
+		
+		delete top (1) from #notas
+		delete top (1) from #pesos
+
+		set @qtdPesosAvaliacao = @qtdPesosAvaliacao - 1
+
+	end
+
+	-- Verifica Status de Aprovacao na disciplina
+
+	if(@media < 3)
+	begin
+		set @statusAluno = 'Reprovado'
+	end
+	else
+	begin
+		if(@media >= 6)
+		begin
+			set @statusAluno = 'Aprovado'
+		end
+		else
+		begin
+			set @statusAluno = 'Exame'
+		end
+	end
+
+	--Atualiza media e status do aluno na tabela matricula
+		
+	update Matricula 
+	set nota = @media, statusMatricula = @statusAluno
+	where cpf = @cpf
+		  and anoSemestre = @anoSemestre
+		  and codDisciplina = @codDisciplina
+
+end
+
+go
+
+-- drop function fn_CalculaFaltasEFrequencia
+create function fn_CalculaFaltasEFrequencia (@codDisciplina int)
+returns @tabela table (
+    cpf     char(11),
+    nome varchar(150),
+    dataChamada date,
+	presencaSemana int,
+	faltasSemana int,
+	totalFaltas int,
+    statusAluno varchar(30) null
+)
+begin
+        declare @qtdAulasPorSemana int,
+				@qtdChamadas int,
+				@horasSemanais varchar(10),
+				@horas int,
+				@minutos int,
+				@totalHoras int,
+				@qtdPresencasPossiveis int,
+				@frequencia decimal(5,2)
+
+		declare @cpf char(11),
+				@nome varchar(150),
+				@dataChamada varchar(255),
+				@ausencia int,
+				@presenca int,
+				@totalfaltas int,
+				@qtdAlunos int,
+				@status varchar(30)
+
+	  -- Pega a quantidade de chamadas realizadas
+
+		set @qtdChamadas = (select count(distinct dataChamada) as numeroDeAulas from ListaChamada where codDisciplina = @codDisciplina)
+
+		-- Pega a Quantidade de presencas possiveis por semana
+	
+		set @horasSemanais = (select horasSemanais from Disciplina where codDisciplina = @codDisciplina)
+		set @horas = (cast(substring(@horasSemanais, 1, charindex(':', @horasSemanais) - 1) as int) * 60 )
+		set @minutos = cast(substring(@horasSemanais, charindex(':',@horasSemanais ) + 1, len(@horasSemanais)) as int)
+		set @totalHoras = @horas + @minutos
+
+		set @qtdAulasPorSemana = (@totalHoras / 50)
+
+		-- Calcula a Quantidade de presencas possiveis no semestre
+
+		set @qtdPresencasPossiveis = (@qtdChamadas * @qtdAulasPorSemana)
+
+		set @qtdAlunos = (select count(distinct cpf) as qtdAlunos from ListaChamada where codDisciplina = 1)
+
+       DECLARE c CURSOR FOR 
+            select m.cpf, a.nome, l.dataChamada, l.ausencia, l.presenca
+			from ListaChamada l, Matricula m, Aluno a 
+			where a.cpf = m.cpf 
+				and m.anoSemestre = l.anoSemestre 
+				and m.cpf = l.cpf
+				and l.anoSemestre = dbo.fn_obterAnoSemestre()
+				and l.codDisciplina = @codDisciplina
+				and m.codDisciplina = l.codDisciplina
+			order by l.cpf, l.dataChamada asc
+
+       OPEN c
+       FETCH NEXT FROM c 
+              INTO @cpf, @nome, @dataChamada, @ausencia, @presenca
+
+       WHILE @@FETCH_STATUS = 0
+       BEGIN
+			
+			declare @somaFaltas int
+
+			set @somaFaltas = 0
+			set @frequencia = 0
+
+			set @somaFaltas = (select sum(faltasSemana) from @tabela where cpf = @cpf)
+			
+			if(@somaFaltas is not null)
+			begin
+				set @totalfaltas = @ausencia + @somaFaltas
+			end
+			else
+			begin 
+				set @totalfaltas = @ausencia
+			end
+
+			-- Regra de 3 para descobrir a frequência
+			SET @frequencia = 100 -((@totalfaltas * 100)/@qtdPresencasPossiveis)
+
+			IF (@frequencia < 75)
+			BEGIN
+				SET @status = 'Reprovado por Falta';
+			END
+			ELSE
+			BEGIN
+				SET @status = 'Aprovado por Presenca';
+			END
+
+			insert into @tabela values(@cpf, @nome, @dataChamada, @presenca, @ausencia, @totalfaltas, @status)
+ 
+            FETCH NEXT FROM c INTO @cpf, @nome, @dataChamada, @ausencia, @presenca
+       END
+       CLOSE c
+       DEALLOCATE c
+
+		return
+end
+
+go
+
 INSERT INTO Curso (codCurso, nome, cargaHoraria, sigla, notaEnade) 
 VALUES 
     (1, 'Análise e Desenvolvimento de Sistemas', 3000, 'ADS', 4),
@@ -936,7 +1290,9 @@ VALUES
     (8, 'Arquitetura e Urbanismo', 4000, 'ARQ', 4),
     (9, 'Economia', 3000, 'ECO', 3),
     (10, 'Letras', 2800, 'LET', 3);
+
 go
+
 INSERT INTO Professor (codProfessor, nome) 
 VALUES 
     (1, 'Prof. João Silva'),
@@ -966,7 +1322,3 @@ insert into PesoAvaliacao (codDisciplina, tipo, peso) values
 
 go
 
-insert into Avaliacao values 
-(0, '41707740860', 20241, 1, 1),
-(0, '41707740860', 20241, 1, 2),
-(0, '41707740860', 20241, 1, 3)

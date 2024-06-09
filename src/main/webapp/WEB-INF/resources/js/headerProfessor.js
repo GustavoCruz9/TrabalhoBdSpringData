@@ -14,6 +14,9 @@ template.innerHTML = `
 	            <li>
 	                <a href="notas" class="funcional">Notas</a>
 	            </li>
+	            <li>
+	                <a href="faltas" class="funcional">Faltas</a>
+	            </li>
 	         </ul>
          </nav>
     </header>

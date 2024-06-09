@@ -35,7 +35,7 @@ public interface INotasRepository extends JpaRepository<Avaliacao, Integer> {
 									 @Param("anoSemestre") int anoSemestre);
 	
 	@Query(value = """
-			select a.nome, a.cpf, pav.tipo ,av.nota 
+			select a.nome, a.cpf, pav.tipo ,av.nota, m.nota, m.statusMatricula
 			from Aluno a, Avaliacao av, PesoAvaliacao pav, Matricula m
 			where av.cpf = a.cpf 
 				  and a.cpf = m.cpf

@@ -26,6 +26,22 @@ public interface IListaChamadaRepository extends JpaRepository<ListaChamada, Lis
 			""", nativeQuery = true)
 	List<Object[]> buscaChamada(@Param("codDisciplina") int CodDisciplina); 
 	
+	@Query(value = """
+			select 
+			    cpf,
+			    nome,
+			    string_agg(convert(varchar, dataChamada, 103), '; ') as datas,
+			    string_agg(cast(presencaSemana as varchar), '; ') as presencas,
+			    string_agg(cast(faltasSemana as varchar), '; ') as ausencias,
+			    max(totalFaltas) as totalFaltas,
+			    max(statusAluno) as statusAluno
+			from fn_calculaFaltasEFrequencia(:codDisciplina)
+			group by cpf, nome
+			order by cpf;
+
+			""", nativeQuery = true)
+	List<Object> buscaFaltaPorSemanas(@Param("codDisciplina") int CodDisciplina); 
+	
 	@Procedure(name = "ListaChamada.sp_cadastraChamada")
 	void cadastrarChamada (@Param("dataChamada") String dataChamada, @Param("anoSemestre") int anoSemestre,
 			@Param("cpf") String cpf, @Param("codDisciplina") int codDisciplina, @Param("presenca") int presenca,
@@ -45,8 +61,7 @@ public interface IListaChamadaRepository extends JpaRepository<ListaChamada, Lis
 				      and m.codDisciplina = d.codDisciplina
 					  and d.codDisciplina = :codDisciplina
 					  and m.anoSemestre = (dbo.fn_obterAnoSemestre())
-					  and m.statusMatricula <> 'Aprovado' and
-					  m.statusMatricula <> 'Dispensado'
+					  and m.statusMatricula <> 'Dispensado'
 			""", nativeQuery = true)
 	List<Object[]> buscarAlunos(@Param("codDisciplina") int codDisciplina);
 	

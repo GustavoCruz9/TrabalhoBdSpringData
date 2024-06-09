@@ -147,6 +147,8 @@
                             <c:if test="${qtdNotas > 2}">
                                 <th>Nota 3</th>
                             </c:if>
+                            <th>Media</th>
+                            <th>Status</th>
                             <th>Ação</th>
                         </tr>
                     </thead>
@@ -154,21 +156,28 @@
                         <c:forEach var="obj" items="${alunosAvaliacaoObject}" varStatus="status">
                 <c:choose>
                     <c:when test="${status.index % 2 == 0}">
-                        <c:set var="aluno" value="${obj}" />
+                        <c:set var="matricula" value="${obj}" />
                     </c:when>
                     <c:otherwise>
                         <c:set var="avaliacoesAluno" value="${obj}" />
                         <tr>
-                            <td><c:out value="${aluno.cpf}" /></td>
-                            <td><c:out value="${aluno.nome}" /></td>
+                            <td><c:out value="${matricula.aluno.cpf}" /></td>
+                            <td><c:out value="${matricula.aluno.nome}" /></td>
                             <c:forEach var="av" items="${avaliacoesAluno}" varStatus="avStatus">
                                 <td><c:out value="${av.nota}" /></td>
                             </c:forEach>
+                            <c:if test="${matricula.nota ne -1}">
+                            	<td><c:out value="${matricula.nota}" /></td>
+                            </c:if>
+                            <c:if test="${matricula.nota eq -1}">
+                            	<td>Nota não lançada</td>
+                            </c:if>
+                            <td><c:out value="${matricula.status}" /></td>
                             <td>
                             	<form action="notas" method="post">
-                            		<input type="submit" value="Lancar Notas" id="botao" name="botao" onclick="setCpfAndSubmit('<c:out value='${aluno.cpf}' />')">
+                            		<input type="submit" value="Lancar Notas" id="botao" name="botao" onclick="setCpfAndSubmit('<c:out value='${matricula.aluno.cpf}' />')">
                             		<input type="hidden" name="cpfSelect" id="cpfSelect"
-									value="<c:out value="${aluno.cpf}" />">
+									value="<c:out value="${matricula.aluno.cpf}" />">
 									<input type="hidden" name="codigoProfessor" id="codigoProfessor"
 									value="${param.codigoProfessor}">
 									<input type="hidden" name="cpf" id="cpf"
@@ -187,7 +196,7 @@
             <form action="notas" method="post">
              <input type="submit" value="Finalizar Semestre" id="botao" name="botao" onclick="return confirm('Tem certeza que deseja finalizar o semestre?');" />
              <input type="hidden" name="cpfSelect" id="cpfSelect"
-				value="<c:out value="${aluno.cpf}" />">
+				value="<c:out value="${matricula.aluno.cpf}" />">
 				<input type="hidden" name="codigoProfessor" id="codigoProfessor"
 				value="${param.codigoProfessor}">
 				<input type="hidden" name="cpf" id="cpf"

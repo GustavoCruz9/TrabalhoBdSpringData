@@ -198,9 +198,11 @@ public class NotasController {
 		for (Avaliacao a : avaliacoes) {
 			Aluno aluno = a.getMatricula().getAluno();
 			String cpf = aluno.getCpf();
+			Matricula matricula = a.getMatricula();
+			matricula.setAluno(aluno);
 
 			if (!cpfsProcessados.contains(cpf)) {
-				objetos.add(aluno);
+				objetos.add(matricula);
 				cpfsProcessados.add(cpf);
 
 				List<Avaliacao> avaliacoesAluno = new ArrayList<>();
@@ -235,6 +237,14 @@ public class NotasController {
 
 			pesoAvaliacao.setTipo((String) row[2].toString());
 			avaliacao.setNota(((Number) row[3]).floatValue());
+			
+			if(row[4] != null) {
+				matricula.setNota((double) row[4]);
+			}else {
+				matricula.setNota(-1);
+			}
+			
+			matricula.setStatus((String) row[5].toString());
 
 			avaliacao.setMatricula(matricula);
 			avaliacao.setPesoAvaliacao(pesoAvaliacao);
