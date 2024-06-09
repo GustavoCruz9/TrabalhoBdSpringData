@@ -5,12 +5,14 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.repository.query.Param;
 
 import guilherme.gustavo.TrabalhoBdSpringData.model.Avaliacao;
 import jakarta.transaction.Transactional;
 
 public interface INotasRepository extends JpaRepository<Avaliacao, Integer> {
+	
 	
 	@Query(value = """
 			select a.nome, a.cpf, pav.tipo ,av.nota 
@@ -20,7 +22,10 @@ public interface INotasRepository extends JpaRepository<Avaliacao, Integer> {
 				  and av.codigoPesoAvaliacao = pav.codigo
 				  and av.anoSemestre = m.anoSemestre
 				  and av.cpf = :cpf
-				  and m.statusMatricula = 'pendente'
+				  and ( m.statusMatricula = 'pendente' 
+				  or m.statusMatricula = 'Reprovado' 
+				  or m.statusMatricula = 'Aprovado' 
+				  or m.statusMatricula = 'Exame')
 				  and av.codDisciplina = m.codDisciplina
 				  and av.anoSemestre = :anoSemestre
 				  and av.codDisciplina = :codDisciplina
@@ -36,7 +41,10 @@ public interface INotasRepository extends JpaRepository<Avaliacao, Integer> {
 				  and a.cpf = m.cpf
 				  and av.codigoPesoAvaliacao = pav.codigo
 				  and av.anoSemestre = m.anoSemestre
-				  and m.statusMatricula = 'pendente'
+				  and ( m.statusMatricula = 'pendente' 
+				  or m.statusMatricula = 'Reprovado' 
+				  or m.statusMatricula = 'Aprovado' 
+				  or m.statusMatricula = 'Exame')
 				  and av.codDisciplina = m.codDisciplina
 				  and av.anoSemestre = :anoSemestre
 				  and av.codDisciplina = :codDisciplina
@@ -58,9 +66,11 @@ public interface INotasRepository extends JpaRepository<Avaliacao, Integer> {
 	@Query(value = """
 			select a.codigo from Avaliacao a, PesoAvaliacao pav 
 			where pav.codigo = a.codigoPesoAvaliacao and a.codDisciplina = :codDisciplina and a.cpf = :cpf
+			and a.anoSemestre = :anoSemestre
 			order by pav.tipo
 			""", nativeQuery = true)
-	List<Object[]> buscaCodigosAvaliacoes(@Param("codDisciplina") int codDisciplina, @Param("cpf") String cpf);
+	List<Object[]> buscaCodigosAvaliacoes(@Param("codDisciplina") int codDisciplina, @Param("cpf") String cpf,
+										  @Param("anoSemestre") int anoSemestre);
 	
 	@Query(value = """
             select d.nome, 
@@ -72,7 +82,8 @@ public interface INotasRepository extends JpaRepository<Avaliacao, Integer> {
 			        concat(av.nota, ' ', NULL), 
 			        '; '
 			    ) within group (order by pav.tipo) as avaliacoes, 
-			    isnull(max(m.nota), -1) as nota
+			    isnull(max(m.nota), -1) as nota,
+				m.statusMatricula
 			from Aluno a, Avaliacao av, PesoAvaliacao pav, Matricula m, Disciplina d
 			where av.cpf = a.cpf
 					and a.cpf = m.cpf
@@ -80,13 +91,16 @@ public interface INotasRepository extends JpaRepository<Avaliacao, Integer> {
 					and av.anoSemestre = m.anoSemestre
 					and m.codDisciplina = d.codDisciplina
 					and av.cpf = :cpf
-					and m.statusMatricula = 'pendente'
+					and( m.statusMatricula = 'pendente' 
+					or m.statusMatricula = 'Reprovado'
+					or m.statusMatricula = 'Aprovado' 
+					or m.statusMatricula = 'Exame')
 					and av.codDisciplina = m.codDisciplina
-					and av.anoSemestre = 20241
-			group by d.nome
+					and av.anoSemestre = :anoSemestre
+			group by d.nome, m.statusMatricula
 			order by d.nome
        """, nativeQuery = true)
-   List<Object> buscaAvaliacoes(@Param("cpf") String cpf);
+   List<Object> buscaAvaliacoes(@Param("cpf") String cpf, @Param("anoSemestre") int anoSemestre);
 	
 	@Modifying
     @Transactional

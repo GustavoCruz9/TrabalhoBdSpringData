@@ -15,6 +15,9 @@ public interface IMatriculaRepository extends JpaRepository<Matricula, Matricula
 	@Procedure(name = "Matricula.sp_validaRa")
 	int sp_validaRa(@Param("ra") String ra);
 	
+	@Procedure(name = "Matricula.sp_finalizaSemestre")
+	String sp_finalizaSemestre (@Param("codDisciplina") int codDisciplina, @Param("anoSemestre") int anoSemestre);
+	
 	@Query(value = """
 			 	select diaSemana, codDisciplina, disciplina, horasSemanais,
 				horaInicio, horaFinal, statusMatricula

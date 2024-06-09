@@ -48,16 +48,18 @@
 				<c:set var="tipos" value="${obj[1]}"/>
 				<c:set var="notas" value="${obj[2]}"/>
 				<c:set var="media" value="${obj[3]}"/>
+				<c:set var="status" value="${obj[4]}"/>
 				<table class="vizualizarNotas" align="center">
 					<thead>
 						<tr>
-							<th colspan="4" class="tableTitle"><c:out value="${obj[0]}"/></th>
+							<th colspan="5" class="tableTitle"><c:out value="${obj[0]}"/></th>
 						</tr>
 						<tr>
 							<c:forEach var="tipo" items="${fn:split(tipos, ';')}">
 		                        <th><c:out value="${tipo}"/></th>
 		                    </c:forEach>
 							<th>Media</th>
+							<th>Status</th>
 						</tr>
 					</thead>	
 					<tbody>
@@ -73,6 +75,9 @@
                                 <td>Nenhuma nota foi lançada</td>
                             </c:otherwise>
                         	</c:choose>
+                        	<c:forEach items="${status}">
+		                        <td><c:out value="${status}"/></td>
+		                    </c:forEach>
 						</tr>
 					</tbody>
 				</table>

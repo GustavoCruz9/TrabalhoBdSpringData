@@ -108,8 +108,5 @@ public class Aluno {
 	
 	@Column(name = "turno", length = 10, nullable = false)
 	private String turno;
-	
-//	@OneToMany(targetEntity = Telefone.class, fetch = FetchType.LAZY)
-//	@JoinColumn(name = "numero", nullable = false)
-//	private Telefone telefone;
+
 }

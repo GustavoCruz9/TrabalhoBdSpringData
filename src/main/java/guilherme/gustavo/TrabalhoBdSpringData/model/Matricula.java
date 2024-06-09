@@ -42,6 +42,17 @@ import lombok.ToString;
 				@StoredProcedureParameter(mode = ParameterMode.OUT, name = "saida", type = String.class)
 		}
 )
+
+@NamedStoredProcedureQuery(
+		name = "Matricula.sp_finalizaSemestre",
+		procedureName = "sp_finalizaSemestre",
+		parameters = {
+				@StoredProcedureParameter(mode = ParameterMode.IN, name = "codDisciplina", type = Integer.class),
+				@StoredProcedureParameter(mode = ParameterMode.IN, name = "anoSemestre", type = Integer.class),
+				@StoredProcedureParameter(mode = ParameterMode.OUT, name = "saida", type = String.class)
+		}
+)
+
 public class Matricula {
 
 	@Id

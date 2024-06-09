@@ -16,7 +16,8 @@
     <script src="./resources/js/headerProfessor.js"></script>
     <main>
         <h1>Notas</h1>
-        
+        	
+          <br>
         
           <div align="center">
                 <c:if test="${not empty erro}">
@@ -33,6 +34,8 @@
                     </h3>
                 </c:if>
             </div>
+            
+            <br><br>
         
         
         <form id="DisciplinaForm" action="notas" method="post">
@@ -61,13 +64,6 @@
 									<input type="hidden" name="cpf" id="cpf"
 									value="<c:out value="${cpf}"></c:out>">	
                         </div>
-                        <!--  
-                        <div class="conteudo">
-                            <input type="text" pattern="[0-9]*" name="cpf" id="cpf"
-                                placeholder="CPF do Aluno" value="${param.cpf}"/> <input type="submit"
-                                value="Buscar Aluno" id="botao" name="botao">
-                        </div>
-                        -->
                     </div>
 
                     <div class="direita">
@@ -114,8 +110,10 @@
                     </div>
                 </div>
                 <div class="baixo">
+                 <c:if test="${not empty avaliacoes}">
                     <input type="submit" value="Confirmar" id="botao"
                         name="botao">
+                  </c:if>
                 </div>
             </div>
             
@@ -137,7 +135,7 @@
 		    </script>
             
             </form>
-
+		<c:if test="${not empty alunosAvaliacaoObject }">
             <div class="tabelaAluno">
                 <table>
                     <thead>
@@ -184,8 +182,19 @@
             </c:forEach>
                     </tbody>
                 </table>
-            </div>            
-            				
+            </div> 
+      
+            <form action="notas" method="post">
+             <input type="submit" value="Finalizar Semestre" id="botao" name="botao" onclick="return confirm('Tem certeza que deseja finalizar o semestre?');" />
+             <input type="hidden" name="cpfSelect" id="cpfSelect"
+				value="<c:out value="${aluno.cpf}" />">
+				<input type="hidden" name="codigoProfessor" id="codigoProfessor"
+				value="${param.codigoProfessor}">
+				<input type="hidden" name="cpf" id="cpf"
+				value="${param.cpf}">	
+				<input type="hidden" name="codDisciplina" id="codDisciplina" value="${disciplina.codDisciplina}">        
+            </form>	
+            </c:if>			
     </main>
 </body>
 </html>

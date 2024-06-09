@@ -1,6 +1,5 @@
 package guilherme.gustavo.TrabalhoBdSpringData.controller;
 
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +20,7 @@ import guilherme.gustavo.TrabalhoBdSpringData.model.Matricula;
 import guilherme.gustavo.TrabalhoBdSpringData.model.PesoAvaliacao;
 import guilherme.gustavo.TrabalhoBdSpringData.model.Professor;
 import guilherme.gustavo.TrabalhoBdSpringData.repository.IListaChamadaRepository;
+import guilherme.gustavo.TrabalhoBdSpringData.repository.IMatriculaRepository;
 import guilherme.gustavo.TrabalhoBdSpringData.repository.INotasRepository;
 
 @Controller
@@ -31,6 +31,9 @@ public class NotasController {
 
 	@Autowired
 	private IListaChamadaRepository lRep;
+	
+	@Autowired
+	private IMatriculaRepository mRep;
 
 	@RequestMapping(name = "notas", value = "/notas", method = RequestMethod.GET)
 	public ModelAndView notasGet(@RequestParam Map<String, String> param, ModelMap model) {
@@ -88,6 +91,10 @@ public class NotasController {
 		if (cmd.equalsIgnoreCase("Buscar Disciplinas")) {
 			professor.setCodProfessor(Integer.parseInt(codigoProfessor));
 		}
+		if (cmd.equalsIgnoreCase("Finalizar Semestre")) {
+			disciplina.setCodDisciplina(Integer.parseInt(codDisciplina));
+			professor.setCodProfessor(Integer.parseInt(codigoProfessor));
+		}
 
 		if ((cmd.equalsIgnoreCase("Confirmar") || cmd.equalsIgnoreCase("Buscar Aluno"))
 				|| cmd.equalsIgnoreCase("Lancar Notas")) {
@@ -139,7 +146,7 @@ public class NotasController {
 				}
 			}
 
-			if (cmd.equalsIgnoreCase("Buscar Aluno") || cmd.equalsIgnoreCase("Lancar Notas")) {
+			if (cmd.equalsIgnoreCase("Lancar Notas")) {
 				if (aluno.getCpf().length() == 11) {
 					avaliacoes = buscaNotasComParam(aluno, disciplina);
 				}
@@ -148,6 +155,10 @@ public class NotasController {
 			if (cmd.equalsIgnoreCase("Confirmar")) {
 				saida = cadastrarAvaliacoes(avaliacoes);
 				avaliacoes = new ArrayList<>();
+			}
+			
+			if (cmd.equalsIgnoreCase("Finalizar Semestre")) {
+				saida = finalizarSemestre(disciplina);
 			}
 
 			if ((statusSelect != null && statusSelect.equalsIgnoreCase("true")) || cmd.equalsIgnoreCase("Confirmar")
@@ -174,6 +185,10 @@ public class NotasController {
 		}
 
 		return new ModelAndView("notas");
+	}
+
+	private String finalizarSemestre(Disciplina disciplina) {
+		return mRep.sp_finalizaSemestre(disciplina.getCodDisciplina(), Integer.parseInt(anoSemestre()));
 	}
 
 	private List<Object> organizaTabelaNotas(List<Avaliacao> avaliacoes) {
@@ -232,7 +247,7 @@ public class NotasController {
 	private List<Avaliacao> buscaCodigosAvaliacoes(Disciplina disciplina, Aluno aluno) {
 		List<Object[]> objetos = new ArrayList<>();
 		List<Avaliacao> avaliacoes = new ArrayList<>();
-		objetos = nRep.buscaCodigosAvaliacoes(disciplina.getCodDisciplina(), aluno.getCpf());
+		objetos = nRep.buscaCodigosAvaliacoes(disciplina.getCodDisciplina(), aluno.getCpf(), Integer.parseInt(anoSemestre()));
 		for (Object[] row : objetos) {
 			Avaliacao avaliacao = new Avaliacao();
 			avaliacao.setCodigo((Integer) row[0]);
