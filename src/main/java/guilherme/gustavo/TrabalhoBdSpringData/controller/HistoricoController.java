@@ -63,9 +63,13 @@ public class HistoricoController {
 					if (cmd.contains("Pesquisa Ra")) {
 						matricula = populaInfosAluno(matricula);
 						matriculas = populaHistorico(aluno);
+						if(matriculas.isEmpty()) {
+							saida = "Não existem matriculas aprovadas";
+						}
 					}
 				} else {
 					erro = "RA inexistente";
+					matricula = new Matricula();
 				}
 			} else {
 				erro = "Tamanho de Ra invalido";
@@ -122,7 +126,7 @@ public class HistoricoController {
 			d.setDisciplina((String) row[1].toString());
 			p.setNome((String) row[2].toString());
 			if (row[3] != null) {
-				m.setNota((double) row[3]);
+				m.setNota(Double.parseDouble(row[3].toString()) );
 			} else {
 				m.setNota(0.0);
 			}

@@ -17,6 +17,26 @@
 	<main>
 
 		<h1>Faltas</h1>
+		
+	
+        
+          <div align="center">
+                <c:if test="${not empty erro}">
+                    <h2>
+                        <b><c:out value="${erro}" /></b>
+                    </h2>
+                </c:if>
+            </div>
+
+            <div align="center">
+                <c:if test="${not empty saida}">
+                    <h3>
+                        <b><c:out value="${saida}" /></b>
+                    </h3>
+                </c:if>
+            </div>
+            
+            <br><br>
 
 		<form id="DisciplinaForm" action="faltas" method="post">
 			<div class="conteudo">
@@ -66,27 +86,6 @@
         </form>	
         </c:if>
 		
-        
-          <div align="center">
-                <c:if test="${not empty erro}">
-                    <h2>
-                        <b><c:out value="${erro}" /></b>
-                    </h2>
-                </c:if>
-            </div>
-
-            <div align="center">
-                <c:if test="${not empty saida}">
-                    <h3>
-                        <b><c:out value="${saida}" /></b>
-                    </h3>
-                </c:if>
-            </div>
-            
-            <br>
-
-		
-
 		<div class="tabelaAluno">
 			<c:forEach var="obj" items="${alunosFaltasObject}">
 				 <c:set var="cpf" value="${obj[0]}"/>

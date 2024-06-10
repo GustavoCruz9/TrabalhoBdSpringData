@@ -94,6 +94,9 @@ public class FaltasController {
 			if (cmd.equalsIgnoreCase("Buscar Disciplinas") || codigoProfessor != null) {
 				if (validaProfessor(professor) == 1) {
 					disciplinas = buscaDisciplina(professor);
+					if(disciplinas.isEmpty()) {
+						erro = "Professor nao leciona nenhuma disciplina";
+					}
 				}
 			}
 			
@@ -179,8 +182,13 @@ public class FaltasController {
 		return lRep.validaProfessor(p.getCodProfessor());
 	}
 	
-	private String trataErro(String message) {
-		// TODO Auto-generated method stub
-		return null;
+	private String trataErro(String erro) {
+		if (erro.contains("Professor nao leciona nenhuma disciplina")){
+			return "Professor nao leciona nenhuma disciplina";
+		}
+		if (erro.contains("O codigo de professor nao existe")){
+			return "O codigo de professor nao existe";
+		}
+		return erro;
 	}
 }

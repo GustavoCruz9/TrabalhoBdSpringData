@@ -16,7 +16,9 @@ public interface IListaChamadaRepository extends JpaRepository<ListaChamada, Lis
 	int validaProfessor(@Param("codProfessor") int codProfessor);
 	
 	@Query(value = """
-			select codDisciplina, nome from Disciplina where codProfessor = :codProfessor
+			select codDisciplina, nome + ' - ' + turno as nome 
+			from Disciplina 
+			where codProfessor = :codProfessor
 			""", nativeQuery = true)
 	List<Object[]> buscaDisciplina(@Param("codProfessor") int codProfessor);
 	
