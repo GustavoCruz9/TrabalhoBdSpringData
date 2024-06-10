@@ -203,7 +203,15 @@
 				value="${param.cpf}">	
 				<input type="hidden" name="codDisciplina" id="codDisciplina" value="${disciplina.codDisciplina}">        
             </form>	
-            </c:if>			
+            
+             <form action="notasRelatorio" method="post" target="_blank">
+             		<input type="submit" value="Gerar Relatorio" id="botao" name="botao"/>   
+             		<input type="hidden" name="codDisciplina" id="codDisciplina" value="${disciplina.codDisciplina}">
+            </form>	
+            </c:if>	
+            
+            <br/>
+            <br/>	
     </main>
 </body>
 </html>

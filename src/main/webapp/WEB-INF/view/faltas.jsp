@@ -58,6 +58,14 @@
 		</form>
 		
 		<br>
+		
+		<c:if test="${not empty alunosFaltasObject}">
+		<form action="faltasRelatorio" method="post" target="_blank">
+             	<input type="submit" value="Gerar Relatorio" id="botao" name="botao"/>   
+             	<input type="hidden" name="codDisciplina" id="codDisciplina" value="${disciplina.codDisciplina}">
+        </form>	
+        </c:if>
+		
         
           <div align="center">
                 <c:if test="${not empty erro}">
@@ -75,7 +83,7 @@
                 </c:if>
             </div>
             
-            <br><br>
+            <br>
 
 		
 
@@ -112,6 +120,7 @@
             </tbody>		    
 			 </c:forEach>
 		</div>
+		
 
 	</main>
 
